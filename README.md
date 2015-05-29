@@ -12,7 +12,6 @@
       * [Install Additional Dependencies](#install-additional-dependencies)
     * [Compile ControlIt!](#compile-controlit)
     * [Enable Gazebo Plugins and Models](#enable-gazebo-plugins-and-models)
-  * [Setup ControlIt! ROS workspace](#setup-controlit-ros-workspace-1)
 
 
 
