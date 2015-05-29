@@ -5,15 +5,13 @@
   * [Introduction](#introduction)
   * [Installation](#installation)
     * [Create a ROS Workspace](#create-a-ros-workspace)
-    * [Setup ControlIt! ROS workspace](#setup-controlit-ros-workspace)
-      * [Add ControlIt! to the ROS Workspace](#add-controlit-to-the-ros-workspace)
-      * [Install RBDL](#install-rbdl)
-      * [Install YAML 0.3.0](#install-yaml-030)
-      * [Install Additional Dependencies](#install-additional-dependencies)
+    * [Add ControlIt! to the ROS Workspace](#add-controlit-to-the-ros-workspace)
+    * [Install RBDL](#install-rbdl)
+    * [Install YAML 0.3.0](#install-yaml-030)
+    * [Install Additional Dependencies](#install-additional-dependencies)
     * [Compile ControlIt!](#compile-controlit)
     * [Enable Gazebo Plugins and Models](#enable-gazebo-plugins-and-models)
-
-
+  * [Run Demonstration Simulations](#run-demonstration-simulation)
 
 ## Introduction ##
 
@@ -107,3 +105,7 @@ Edit ~/.bashrc and update the section related to ControlIt! to be the following:
     source `rospack find controlit_configs`/setup.sh
 
 Close and re-open your terminals for the settings to apply.
+
+# Run Demonstration Simulations #
+
+For tutorials on how to use ControlIt!, see: http://robotcontrolit.com/tutorials
