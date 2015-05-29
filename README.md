@@ -1,5 +1,18 @@
 # ControlIt! - A Whole Body Operational Space Control Middleware #
 
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [ControlIt! - A Whole Body Operational Space Control Middleware](#)
+    - [Introduction](#)
+    - [Installation](#)
+        - [Create a ROS Workspace](#)
+        - [Add ControlIt! to the ROS Workspace](#)
+        - [Install RBDL](#)
+        - [Install YAML 0.3.0](#)
+        - [Install Additional Dependencies](#)
+    - [Compile ControlIt!](#)
+    - [Enable Gazebo Plugins and Models](#)
+    
 ## Introduction ##
 
 This is repository contains ControlIt!, a middleware that supports the Whole
