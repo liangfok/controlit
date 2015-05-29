@@ -1,18 +1,25 @@
 # ControlIt! - A Whole Body Operational Space Control Middleware #
 
-**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+**Table of Contents**
 
-- [ControlIt! - A Whole Body Operational Space Control Middleware](#)
-    - [Introduction](#)
-    - [Installation](#)
-        - [Create a ROS Workspace](#)
-        - [Add ControlIt! to the ROS Workspace](#)
-        - [Install RBDL](#)
-        - [Install YAML 0.3.0](#)
-        - [Install Additional Dependencies](#)
-    - [Compile ControlIt!](#)
-    - [Enable Gazebo Plugins and Models](#)
-    
+  * [ControlIt! - A Whole Body Operational Space Control Middleware](#controlit---a-whole-body-operational-space-control-middleware)
+    * [Introduction](#introduction)
+    * [Installation](#installation)
+      * [Create a ROS Workspace](#create-a-ros-workspace)
+  * [Setup ControlIt! ROS workspace](#setup-controlit-ros-workspace)
+  * [source <code>rospack find controlit_environment_config</code>/setup.sh](#source-rospack-find-controlit_environment_configsetupsh)
+  * [source <code>rospack find controlit_models</code>/setup.sh](#source-rospack-find-controlit_modelssetupsh)
+  * [source <code>rospack find controlit_configs</code>/setup.sh](#source-rospack-find-controlit_configssetupsh)
+      * [Add ControlIt! to the ROS Workspace](#add-controlit-to-the-ros-workspace)
+      * [Install RBDL](#install-rbdl)
+      * [Install YAML 0.3.0](#install-yaml-030)
+      * [Install Additional Dependencies](#install-additional-dependencies)
+    * [Compile ControlIt!](#compile-controlit)
+    * [Enable Gazebo Plugins and Models](#enable-gazebo-plugins-and-models)
+  * [Setup ControlIt! ROS workspace](#setup-controlit-ros-workspace-1)
+
+
+
 ## Introduction ##
 
 This is repository contains ControlIt!, a middleware that supports the Whole
