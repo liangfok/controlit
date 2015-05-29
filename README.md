@@ -11,6 +11,7 @@
     * [Install Additional Dependencies](#install-additional-dependencies)
     * [Compile ControlIt!](#compile-controlit)
     * [Enable Gazebo Plugins and Models](#enable-gazebo-plugins-and-models)
+    * [Configure Shared Memory](#configure-shared-memory)
   * [Run Demonstration Simulations](#run-demonstration-simulations)
 
 ## Introduction ##
@@ -112,6 +113,12 @@ Edit ~/.bashrc and update the section related to ControlIt! to be the following:
     source `rospack find controlit_configs`/setup.sh
 
 Close and re-open your terminals for the settings to apply.
+
+## Configure Shared Memory ##
+
+Many of ControlIt!'s demos use shared memory to communicate between the whole body controller and the simulator. To prevent needing to allocate this shared memory each time you restart your computer (and having to type your sudo password), we recommend that you permanently allocate sufficient shared memory by executing the command below:
+
+    $ rosrun shared_memory_interface set_shared_memory_size_persistent 536870912
 
 # Run Demonstration Simulations #
 
