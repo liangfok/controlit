@@ -1,0 +1,12 @@
+<library path="lib/librobot_core_example_plugin">
+	<class name="controlit/SimpleTask" type="controlit::example::SimpleTask" base_class_type="controlit::Task">
+		<description>
+			An example task
+		</description>
+	</class>
+	<class name="controlit/SimpleConstraint" type="controlit::example::SimpleConstraint" base_class_type="controlit::Constraint">
+		<description>
+			An example constraint
+		</description>
+	</class>
+</library>

@@ -1,0 +1,35 @@
+<library path="lib/libcontrolit_robot_interface_library">
+
+    <!--
+    <class name="effort_controllers/WbcController" type="controlit::robot_interface_library::RobotInterfaceValkyrie" base_class_type="controlit::RobotInterface">
+        <description>
+            A ControlIt! controller for Valkyrie.
+        </description>
+    </class>
+    -->
+
+    <class name="controlit_robot_interface/RobotInterfaceROSTopic" type="controlit::robot_interface_library::RobotInterfaceROSTopic" base_class_type="controlit::RobotInterface">
+        <description>
+            A ControlIt! robot interface for robots accessible via ROS topics.
+        </description>
+    </class>
+
+    <class name="controlit_robot_interface/RobotInterfaceBenchmark" type="controlit::robot_interface_library::RobotInterfaceBenchmark" base_class_type="controlit::RobotInterface">
+        <description>
+            A ControlIt! robot interface for benchmarking purposes.
+        </description>
+    </class>
+
+    <class name="controlit_robot_interface/RobotInterfaceUDP" type="controlit::robot_interface_library::RobotInterfaceUDP" base_class_type="controlit::RobotInterface">
+        <description>
+            A ControlIt! robot interface for robots accessible via UDP.
+        </description>
+    </class>
+
+    <class name="controlit_robot_interface/RobotInterfaceSM" type="controlit::robot_interface_library::RobotInterfaceSM" base_class_type="controlit::RobotInterface">
+        <description>
+            A ControlIt! robot interface for robots accessible via shared memory.
+        </description>
+    </class>
+
+</library>

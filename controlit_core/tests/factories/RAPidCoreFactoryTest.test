@@ -1,0 +1,4 @@
+<launch>
+  <!-- The test -->
+  <test test-name="RAPidCoreFactoryTest" pkg="wbc" type="RAPidCoreFactoryTest"/>
+</launch>

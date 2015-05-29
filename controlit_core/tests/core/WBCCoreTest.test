@@ -1,0 +1,4 @@
+<launch>
+  <!-- The test -->
+  <test test-name="wbc_core_Ros_Test" pkg="wbc" type="wbc_core_Ros_Test"/>
+</launch>

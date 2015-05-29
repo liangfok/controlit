@@ -1,0 +1,55 @@
+header:
+  version: 1.0
+  description: test
+tasks:
+- type: rapid/SimpleTask
+  name: t1
+  parameters:
+  - name: intVal
+    type: int
+    value: 3
+  - name: realVal
+    type: real
+    value: -2.5
+  - name: stringVal
+    type: string
+    value: world
+  events:
+  - name: converged
+    expression: abs(intVal) < 0.1
+  bindings:
+  - middleware: ROS
+    topic: /some/ros/topic/name
+    direction: input
+    parameters: [intVal]
+- type: rapid/SimpleTask
+  name: t2
+  parameters:
+  - name: intVal
+    type: int
+    value: -3
+  - name: realVal
+    type: real
+    value: 4.5
+  - name: stringVal
+    type: string
+    value: world2
+  events:
+  - name: converged
+    expression: abs(intVal) > 0.2
+  bindings:
+  - middleware: ROS
+    topic: /some/ros/topic/name
+    direction: input
+    parameters: [intVal]
+compound_task:
+  type: compound_task
+  name: ct
+  events:
+  - name: converged
+    expression: (abs(intVal) < 0.1) && t1.converged
+  task_list:
+  - name: t1
+    priority: 0
+  - name: t2
+    priority: 1

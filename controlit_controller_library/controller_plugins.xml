@@ -1,0 +1,14 @@
+<library path="lib/libcontrolit_controller_library">
+
+  <class name="controlit_wbc/WBOSC" type="controlit::controller_library::WBOSC" base_class_type="controlit::Controller">
+    <description>
+      The whole body operational space control controller.
+    </description>
+  </class>
+
+  <class name="controlit_wbc/WBOSC_Impedance" type="controlit::controller_library::WBOSC_Impedance" base_class_type="controlit::Controller">
+    <description>
+      The whole body operational space control controller with a wrapper that provides impedance commands.
+    </description>
+  </class>
+</library>

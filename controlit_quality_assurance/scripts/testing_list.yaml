@@ -1,0 +1,21 @@
+available_demo:
+  - atlas_legs_plain
+  - atlas_plain
+  - atlas_plain_pinned
+  - dreamer
+  - dreamer_no_left_arm
+  - dreamer_testbed
+  - stickbot_bipedal_12dof
+  - stickbot_humanoid_32dof
+  - stickbot_humanoid_32dof_pinned
+  - stickbot_leg_6dof
+  - stickbot_lowerleg_3dof
+  - stickbot_upperbody_10dof
+  - trikey
+  - trikey_pinned
+
+skip_test_list:
+  - atlas_plain
+  - dreamer_testbed
+
+

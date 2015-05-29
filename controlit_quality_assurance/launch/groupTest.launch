@@ -1,0 +1,6 @@
+<launch>
+
+    <arg name="arg" default="" />
+    <node name="Controlit_quality_assurance" output="screen" required="true" pkg="controlit_quality_assurance" type="groupTest.py" args="$(arg arg)" />
+
+</launch>

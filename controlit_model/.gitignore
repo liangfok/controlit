@@ -1,0 +1,11 @@
+.cproject
+.project
+.pydevproject
+.settings
+cmake_install.cmake
+doc
+_gtest_from_src
+bin/
+build/
+lib/
+models/urdf/

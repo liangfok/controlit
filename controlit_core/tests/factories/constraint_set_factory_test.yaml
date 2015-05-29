@@ -1,0 +1,27 @@
+header:
+  version: 1.0
+  description: contraint set test
+constraints:
+  - type: rapid/SimpleConstraint
+    name: RightFootContact
+    parameters:
+    - name: intVal
+      type: int
+      value: -3
+    - name: realVal
+      type: real
+      value: 4.5
+    - name: stringVal
+      type: string
+      value: world2
+    - name: masterNodeName
+      type: string
+      value: rigid6DoF
+    # - name: contactPoint
+    #   type: vector
+    #   value: [0.0, 0.0, 0.0]
+constraint_set:
+  type: ConstraintSet
+  name: singleContactConstraint
+  active_constraints:
+    - name: RightFootContact

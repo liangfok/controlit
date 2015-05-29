@@ -1,0 +1,29 @@
+header:
+  version: 1.0
+  description: task factory test
+type: rapid/SimpleTask
+name: t1
+parameters:
+- name: intVal
+  type: int
+  value: 10
+- name: realVal
+  type: real
+  value: -5.4
+- name: stringVal
+  type: string
+  value: hello
+- name: vectorVal
+  type: vector
+  value: [1.0, 0.0]
+- name: matrixVal
+  type: matrix
+  value: [[1.0, 0.0, 0.0, 1.0],[0.0,1.0,1.0,0.0]]
+events:
+- name: converged
+  expression: abs(intVal) < 0.1
+bindings:
+- middleware: ROS
+  topic: /some/ros/topic/name
+  direction: input
+  parameters: [intVal]

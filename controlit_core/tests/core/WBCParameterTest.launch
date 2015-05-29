@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+
+<launch>
+  <rosparam param="controlit/whole_body_controller_type">"Torque"</rosparam>
+  <rosparam param="controlit_update_rate">211</rosparam>
+  <rosparam param="controlit_torque_offsets">[2.1, -9.2, 10.6, -55.2, 23.1]</rosparam>
+  <rosparam param="controlit_torque_scaling_factors">[-1.1, 1.1, -2.2, 2.2, -3.3]</rosparam>
+  <rosparam param="controlit_gravity_vector">[0, 0, 10.1]</rosparam>
+  <rosparam param="controlit_ramp_up_time">4.6</rosparam>
+  <rosparam param="controlit_coupled_joint_groups">[["foo", "bar"], ["baz"], ["qux", "quux"]]</rosparam>
+  <rosparam param="controlit_gravity_compensation_mask">["foo", "bar", "baz", "qux"]</rosparam>
+  <rosparam param="controlit_effective_gain_pass_through_mask">["amy", "jon", "bob", "lou", "kat"]</rosparam>
+  <rosparam param="controlit_max_effort_command">123.456</rosparam>
+  <rosparam param="enforce_effort_limits">True</rosparam>
+  <rosparam param="enforce_velocity_limits">True</rosparam>
+  <rosparam param="enforce_lower_position_limits">True</rosparam>
+  <rosparam param="enforce_upper_position_limits">True</rosparam>
+</launch>

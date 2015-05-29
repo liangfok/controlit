@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<package format="2">
+    
+    <name>controlit_robot_interface_library</name>
+    
+    <version>0.0.0</version>
+    
+    <description>Contains a library of robot interfaces that can be used by ControlIt!.</description>
+    
+    <license>LGPLv2.1</license>
+    
+    <url>http://ros.org/wiki/controlit_robot_interface_library</url>
+  
+    <maintainer email="liangfok@utexas.edu">Chien-Liang Fok</maintainer>
+
+    <author>Chien-Liang Fok</author>
+    <author>Gwendolyn Johnson</author>
+    <author>J.D. Yamokoski</author>
+
+    <!-- The *_depend tags are used to specify dependencies -->
+    <!-- Dependencies can be catkin packages or system dependencies -->
+    <!-- Examples: -->
+    <!-- Use build_depend for packages you need at compile time: -->
+    <!--   <build_depend>message_generation</build_depend> -->
+    <!-- Use buildtool_depend for build tool packages: -->
+    <!--   <buildtool_depend>catkin</buildtool_depend> -->
+    <!-- Use run_depend for packages you need at runtime: -->
+    <!--   <run_depend>message_runtime</run_depend> -->
+    <!-- Use test_depend for packages you need only for testing: -->
+    <!--   <test_depend>gtest</test_depend> -->
+    <buildtool_depend>catkin</buildtool_depend>
+    
+    <depend>controlit_core</depend>
+    <depend>message_generation</depend>
+    <depend>shared_memory_interface</depend>
+
+    <!-- <depend package="controlit_udp"/>
+    <depend package="controlit_core"/>
+    <depend package="nav_msgs"/>
+    <depend package="sensor_msgs"/>
+    <depend package="tf"/>
+    <depend package="urdf"/>
+  
+    <depend package="shared_memory_interface"/> -->
+  
+    <export>
+        <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lcontrolit_robot_interface_library"/>
+        <controlit_core plugin="${prefix}/robot_interface_plugins.xml" />
+        <!-- <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lcontrolit_robot_interface_library"/> -->
+    </export>
+
+</package>

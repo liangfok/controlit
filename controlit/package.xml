@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>controlit</name>
+
+    <version>0.0.0</version>
+    
+    <description>A meta-package for ControlIt!.</description>
+    
+    <!-- One license tag required, multiple allowed, one license per tag -->
+    <license>LGPLv2.1</license>
+  
+    <!-- Url tags are optional, but mutiple are allowed, one per tag -->
+    <url type="website">http://robotcontrolit.com</url>
+
+    <maintainer email="liangfok@utexas.edu">Chien-Liang Fok</maintainer>
+
+    <author>Chien-Liang Fok</author>
+    <author>Gwendolyn Johnson</author>
+    <author>J.D. Yamokoski</author>
+  
+    <!-- The *_depend tags are used to specify dependencies -->
+    <!-- Dependencies can be catkin packages or system dependencies -->
+    <!-- Examples: -->
+    <!-- Use build_depend for packages you need at compile time: -->
+    <!--   <build_depend>message_generation</build_depend> -->
+    <!-- Use buildtool_depend for build tool packages: -->
+    <!--   <buildtool_depend>catkin</buildtool_depend> -->
+    <!-- Use exec_depend for packages you need at runtime: -->
+    <!--   <exec_depend>message_runtime</exec_depend> -->
+    <!-- Use test_depend for packages you need only for testing: -->
+    <!--   <test_depend>gtest</test_depend> -->
+    <buildtool_depend>catkin</buildtool_depend>
+  
+    <exec_depend>controlit_binding_factory_library</exec_depend>
+    <exec_depend>controlit_constraint_library</exec_depend>
+    <exec_depend>controlit_controller_library</exec_depend>
+    <exec_depend>controlit_core</exec_depend>
+    <exec_depend>controlit_dependency_addons</exec_depend>
+    <exec_depend>controlit_environment_config</exec_depend>
+    <exec_depend>controlit_exec</exec_depend>
+    <exec_depend>controlit_goal_generators</exec_depend>
+    <exec_depend>controlit_logging</exec_depend>
+    <exec_depend>controlit_model</exec_depend>
+    <exec_depend>controlit_quality_assurance</exec_depend>
+    <exec_depend>controlit_robot_interface_library</exec_depend>
+    <exec_depend>controlit_servo_clock_library</exec_depend>
+    <exec_depend>controlit_task_library</exec_depend>
+    <exec_depend>controlit_trajectory_generators</exec_depend>
+    <exec_depend>controlit_udp</exec_depend>
+  
+    <!-- The export tag contains other, unspecified, tags -->
+    <export>
+        <!-- Other tools can request additional information be placed here -->
+    </export>
+</package>

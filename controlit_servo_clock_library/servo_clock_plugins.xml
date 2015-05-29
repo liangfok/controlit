@@ -1,0 +1,14 @@
+<library path="lib/libcontrolit_servo_clock_library">
+
+    <class name="controlit_servo_clock/ServoClockROS" type="controlit::servo_clock_library::ServoClockROS" base_class_type="controlit::ServoClock">
+        <description>
+            A ControlIt! servo clock based on ROS timers.
+        </description>
+    </class>
+
+    <class name="controlit_servo_clock/ServoClockChrono" type="controlit::servo_clock_library::ServoClockChrono" base_class_type="controlit::ServoClock">
+        <description>
+            A ControlIt! servo clock based on chrono timers.
+        </description>
+    </class>
+</library>

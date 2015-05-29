@@ -1,0 +1,730 @@
+header:
+  version: 2
+  description: wbc/V0SimpleJPosCompoundTask
+tasks:
+  - type: controlit/JointPositionTask # Must Match the NAME of the task in the task_library
+    name: JPosTask     # Arbitrary instance name
+    parameters:
+      - name: enabled
+        type: integer
+        value: 1
+      - name: kp
+        type: vector
+        value: [100, # LeftHipRotator
+                100, # LeftHipAdductor
+                100, # LeftHipExtensor
+                100, # LeftKneeExtensor
+                100, # LeftAnkleExtensor
+                100, # LeftAnkle
+                100, # RightHipRotator
+                100, # RightHipAdductor
+                100, # RightHipExtensor
+                100, # RightKneeExtensor
+                100, # RightAnkleExtensor
+                100, # RightAnkle
+                100, # WaistRotator
+                100, # WaistExtensor
+                100, # WaistLateralExtensor
+                100, # LeftShoulderExtensor
+                100, # LeftShoulderAdductor
+                100, # LeftShoulderSupinator
+                100, # LeftElbowExtensor
+                100, # LeftForearmSupinator
+                100, # LeftWristExtensor
+                100, # LeftWrist
+                100, # LowerNeckExtensor
+                100, # NeckRotator
+                100, # UpperNeckExtensor
+                100, # RightShoulderExtensor
+                100, # RightShoulderAdductor
+                100, # RightShoulderSupinator
+                100, # RightElbowExtensor
+                100, # RightForearmSupinator
+                100, # RightWristExtensor
+                100] # RightWrist
+      - name: kd
+        type: vector
+        value: [20, # LeftHipRotator
+                20, # LeftHipAdductor
+                20, # LeftHipExtensor
+                20, # LeftKneeExtensor
+                20, # LeftAnkleExtensor
+                20, # LeftAnkle
+                20, # RightHipRotator
+                20, # RightHipAdductor
+                20, # RightHipExtensor
+                20, # RightKneeExtensor
+                20, # RightAnkleExtensor
+                20, # RightAnkle
+                20, # WaistRotator
+                20, # WaistExtensor
+                20, # WaistLateralExtensor
+                20, # LeftShoulderExtensor
+                20, # LeftShoulderAdductor
+                20, # LeftShoulderSupinator
+                20, # LeftElbowExtensor
+                20, # LeftForearmSupinator
+                20, # LeftWristExtensor
+                20, # LeftWrist
+                20, # LowerNeckExtensor
+                20, # NeckRotator
+                20, # UpperNeckExtensor
+                20, # RightShoulderExtensor
+                20, # RightShoulderAdductor
+                20, # RightShoulderSupinator
+                20, # RightElbowExtensor
+                20, # RightForearmSupinator
+                20, # RightWristExtensor
+                20] # RightWrist
+      - name: maxVelocity
+        type: vector
+        value: [2, # LeftHipRotator
+                2, # LeftHipAdductor
+                2, # LeftHipExtensor
+                2, # LeftKneeExtensor
+                2, # LeftAnkleExtensor
+                2, # LeftAnkle
+                2, # RightHipRotator
+                2, # RightHipAdductor
+                2, # RightHipExtensor
+                2, # RightKneeExtensor
+                2, # RightAnkleExtensor
+                2, # RightAnkle
+                2, # WaistRotator
+                2, # WaistExtensor
+                2, # WaistLateralExtensor
+                2, # LeftShoulderExtensor
+                2, # LeftShoulderAdductor
+                2, # LeftShoulderSupinator
+                2, # LeftElbowExtensor
+                2, # LeftForearmSupinator
+                2, # LeftWristExtensor
+                2, # LeftWrist
+                2, # LowerNeckExtensor
+                2, # NeckRotator
+                2, # UpperNeckExtensor
+                2, # RightShoulderExtensor
+                2, # RightShoulderAdductor
+                2, # RightShoulderSupinator
+                2, # RightElbowExtensor
+                2, # RightForearmSupinator
+                2, # RightWristExtensor
+                2] # RightWrist
+      - name: maxAcceleration
+        type: real
+        value: 0.0, #1.0
+      - name: goalPosition
+        type: vector
+        value: [0, # LeftHipRotator
+                0, # LeftHipAdductor
+                0, # LeftHipExtensor
+                0, # LeftKneeExtensor
+                0, # LeftAnkleExtensor
+                0, # LeftAnkle
+                0, # RightHipRotator
+                0, # RightHipAdductor
+                0, # RightHipExtensor
+                0, # RightKneeExtensor
+                0, # RightAnkleExtensor
+                0, # RightAnkle
+                0, # WaistRotator
+                0, # WaistExtensor
+                0, # WaistLateralExtensor
+                0, # LeftShoulderExtensor
+                -0.14, # LeftShoulderAdductor
+                0, # LeftShoulderSupinator
+                0, # LeftElbowExtensor
+                0, # LeftForearmSupinator
+                0, # LeftWristExtensor
+                0, # LeftWrist
+                0, # LowerNeckExtensor
+                0, # NeckRotator
+                0, # UpperNeckExtensor
+                0, # RightShoulderExtensor
+                -0.14, # RightShoulderAdductor
+                0, # RightShoulderSupinator
+                0, # RightElbowExtensor
+                0, # RightForearmSupinator
+                0, # RightWristExtensor
+                0] # RightWrist
+      - name: goalVelocity
+        type: vector
+        value: [0, # LeftHipRotator
+                0, # LeftHipAdductor
+                0, # LeftHipExtensor
+                0, # LeftKneeExtensor
+                0, # LeftAnkleExtensor
+                0, # LeftAnkle
+                0, # RightHipRotator
+                0, # RightHipAdductor
+                0, # RightHipExtensor
+                0, # RightKneeExtensor
+                0, # RightAnkleExtensor
+                0, # RightAnkle
+                0, # WaistRotator
+                0, # WaistExtensor
+                0, # WaistLateralExtensor
+                0, # LeftShoulderExtensor
+                0, # LeftShoulderAdductor
+                0, # LeftShoulderSupinator
+                0, # LeftElbowExtensor
+                0, # LeftForearmSupinator
+                0, # LeftWristExtensor
+                0, # LeftWrist
+                0, # LowerNeckExtensor
+                0, # NeckRotator
+                0, # UpperNeckExtensor
+                0, # RightShoulderExtensor
+                0, # RightShoulderAdductor
+                0, # RightShoulderSupinator
+                0, # RightElbowExtensor
+                0, # RightForearmSupinator
+                0, # RightWristExtensor
+                0] # RightWrist
+      - name: actualPosition
+        type: vector
+        value: [0, # LeftHipRotator
+                0, # LeftHipAdductor
+                0, # LeftHipExtensor
+                0, # LeftKneeExtensor
+                0, # LeftAnkleExtensor
+                0, # LeftAnkle
+                0, # RightHipRotator
+                0, # RightHipAdductor
+                0, # RightHipExtensor
+                0, # RightKneeExtensor
+                0, # RightAnkleExtensor
+                0, # RightAnkle
+                0, # WaistRotator
+                0, # WaistExtensor
+                0, # WaistLateralExtensor
+                0, # LeftShoulderExtensor
+                0, # LeftShoulderAdductor
+                0, # LeftShoulderSupinator
+                0, # LeftElbowExtensor
+                0, # LeftForearmSupinator
+                0, # LeftWristExtensor
+                0, # LeftWrist
+                0, # LowerNeckExtensor
+                0, # NeckRotator
+                0, # UpperNeckExtensor
+                0, # RightShoulderExtensor
+                0, # RightShoulderAdductor
+                0, # RightShoulderSupinator
+                0, # RightElbowExtensor
+                0, # RightForearmSupinator
+                0, # RightWristExtensor
+                0] # RightWrist
+      - name: error
+        type: vector
+        value: [0, # LeftHipRotator
+                0, # LeftHipAdductor
+                0, # LeftHipExtensor
+                0, # LeftKneeExtensor
+                0, # LeftAnkleExtensor
+                0, # LeftAnkle
+                0, # RightHipRotator
+                0, # RightHipAdductor
+                0, # RightHipExtensor
+                0, # RightKneeExtensor
+                0, # RightAnkleExtensor
+                0, # RightAnkle
+                0, # WaistRotator
+                0, # WaistExtensor
+                0, # WaistLateralExtensor
+                0, # LeftShoulderExtensor
+                0, # LeftShoulderAdductor
+                0, # LeftShoulderSupinator
+                0, # LeftElbowExtensor
+                0, # LeftForearmSupinator
+                0, # LeftWristExtensor
+                0, # LeftWrist
+                0, # LowerNeckExtensor
+                0, # NeckRotator
+                0, # UpperNeckExtensor
+                0, # RightShoulderExtensor
+                0, # RightShoulderAdductor
+                0, # RightShoulderSupinator
+                0, # RightElbowExtensor
+                0, # RightForearmSupinator
+                0, # RightWristExtensor
+                0] # RightWrist
+      - name: errorDot
+        type: vector
+        value: [0, # LeftHipRotator
+                0, # LeftHipAdductor
+                0, # LeftHipExtensor
+                0, # LeftKneeExtensor
+                0, # LeftAnkleExtensor
+                0, # LeftAnkle
+                0, # RightHipRotator
+                0, # RightHipAdductor
+                0, # RightHipExtensor
+                0, # RightKneeExtensor
+                0, # RightAnkleExtensor
+                0, # RightAnkle
+                0, # WaistRotator
+                0, # WaistExtensor
+                0, # WaistLateralExtensor
+                0, # LeftShoulderExtensor
+                0, # LeftShoulderAdductor
+                0, # LeftShoulderSupinator
+                0, # LeftElbowExtensor
+                0, # LeftForearmSupinator
+                0, # LeftWristExtensor
+                0, # LeftWrist
+                0, # LowerNeckExtensor
+                0, # NeckRotator
+                0, # UpperNeckExtensor
+                0, # RightShoulderExtensor
+                0, # RightShoulderAdductor
+                0, # RightShoulderSupinator
+                0, # RightElbowExtensor
+                0, # RightForearmSupinator
+                0, # RightWristExtensor
+                0] # RightWrist
+    # events:
+    #   - name: converged
+    #     expression: error < 55e-4 #err is a norm...it is positive
+    #   - name: quiescent
+    #     expression: error_dot < 3e-2 #absolute value take in code
+  # - type: controlit/CartesianPositionTask # Must Match the NAME of the task in the task_library
+  #   name: CartesianPositionTask     # Arbitrary instance name
+  #   parameters:
+  #     - name: enabled
+  #       type: integer
+  #       value: 1
+  #     - name: kp
+  #       type: double
+  #       value: 100
+  #     - name: kd
+  #       type: double
+  #       value: 20
+  #     - name: maxVelocity
+  #       type: real
+  #       value: 1
+  #     - name: maxAcceleration
+  #       type: real
+  #       value: 1
+  #     - name: frameName
+  #       type: string
+  #       value: "world"
+  #     - name: bodyName
+  #       type: string
+  #       # value: "/v1/RightForearm"
+  #       value: "/v1/RightPalm"
+  #     - name: controlPoint
+  #       type: vector
+  #       value: [0, 0, 0]   # x, y, z
+  #     - name: projection
+  #       type: matrix
+  #       value: [[1, 0, 0],
+  #               [0, 1, 0],
+  #               [0, 0, 1]]
+  #     - name: latchOn
+  #       type: integer
+  #       value: 0
+  #     - name: resetLatch
+  #       type: integer
+  #       value: 0
+  #     - name: goalPosition
+  #       type: vector
+  #       value: [0.5, 0, 1.2]   # x, y, z
+  #     - name: actualPosition
+  #       type: vector
+  #       value: [0, 0, 0]   # x, y, z
+  #     - name: actualWorldPosition
+  #       type: vector
+  #       value: [0, 0, 0]   # x, y, z
+  #     - name: error
+  #       type: vector
+  #       value: [0, 0, 0]   # x, y, z
+  #     - name: errorDot
+  #       type: vector
+  #       value: [0, 0, 0]   # x, y, z
+  #     - name: errorNorm
+  #       type: double
+  #       value: 0
+  #     - name: errorDotNorm
+  #       type: double
+  #       value: 0
+  #   # events:
+  #   #   - name: converged
+  #   #     expression: error < 55e-4 #err is a norm...it is positive
+  #   #   - name: quiescent
+  #   #     expression: error_dot < 3e-2 #absolute value take in code
+  - type: controlit/CartesianPositionTaskWorldGoal # Must Match the NAME of the task in the task_library
+    name: CartesianPositionTask     # Arbitrary instance name
+    parameters:
+      - name: enabled
+        type: integer
+        value: 1
+      - name: kp
+        type: double
+        value: 500
+      - name: kd
+        type: double
+        value: 30
+      - name: maxVelocity
+        type: real
+        value: 2
+      - name: maxAcceleration
+        type: real
+        value: 1
+      - name: bodyName
+        type: string
+        # value: "/v1/RightForearm"
+        value: "/v1/RightPalm"
+      - name: controlPoint
+        type: vector
+        value: [0, 0, 0]   # x, y, z
+      - name: goalPosition
+        type: vector
+        value: [0.32, 0, 1.35]   # x, y, z
+      - name: goalVelocity
+        type: vector
+        value: [0, 0, 0]   # x, y, z
+      - name: actualWorldPosition
+        type: vector
+        value: [0, 0, 0]   # x, y, z
+      - name: actualVelocity
+        type: vector
+        value: [0, 0, 0]   # x, y, z
+      - name: error
+        type: vector
+        value: [0, 0, 0]   # x, y, z
+      - name: errorDot
+        type: vector
+        value: [0, 0, 0]   # x, y, z
+      - name: errorNorm
+        type: double
+        value: 0
+      - name: errorDotNorm
+        type: double
+        value: 0
+    # events:
+    #   - name: converged
+    #     expression: error < 55e-4 #err is a norm...it is positive
+    #   - name: quiescent
+    #     expression: error_dot < 3e-2 #absolute value take in code
+compound_task:
+  type: compound_task
+  name: V1PinnedCartPosCompoundTask
+  bindings:
+# Parameters of CartesianPositionTask
+    - parameters: [CartesianPositionTask.enabled]
+      direction: input
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/enabled
+          type: "std_msgs/Int32"
+    - parameters: [CartesianPositionTask.kp]
+      direction: input
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/kp
+          type: "std_msgs/Float64"
+    - parameters: [CartesianPositionTask.kd]
+      direction: input
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/kd
+          type: "std_msgs/Float64"
+    - parameters: [CartesianPositionTask.maxVelocity]
+      direction: input
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/maxVelocity
+          type: "std_msgs/Float64"
+    - parameters: [CartesianPositionTask.maxAcceleration]
+      direction: input
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/maxAcceleration
+          type: "std_msgs/Float64"
+    - parameters: [CartesianPositionTask.bodyName]
+      direction: input
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/bodyName
+          type: "std_msgs/String"
+    - parameters: [CartesianPositionTask.controlPoint]
+      direction: input
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/controlPoint
+          type: "std_msgs/Float64MultiArray"
+    - parameters: [CartesianPositionTask.goalPosition]
+      direction: input
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/goalPosition
+          type: "std_msgs/Float64MultiArray"
+    - parameters: [CartesianPositionTask.actualWorldPosition]
+      direction: output
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/actualWorldPosition
+          type: "std_msgs/Float64MultiArray"
+          publish_rate: 100.0
+          queue_size: 2
+          latched: 0
+    - parameters: [CartesianPositionTask.actualVelocity]
+      direction: output
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/actualVelocity
+          type: "std_msgs/Float64MultiArray"
+          publish_rate: 100.0
+          queue_size: 2
+          latched: 0
+    - parameters: [CartesianPositionTask.error]
+      direction: output
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/error
+          type: "std_msgs/Float64MultiArray"
+          publish_rate: 100.0
+          queue_size: 2
+          latched: 0
+    - parameters: [CartesianPositionTask.errorDot]
+      direction: output
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/errorDot
+          type: "std_msgs/Float64MultiArray"
+          publish_rate: 100.0
+          queue_size: 2
+          latched: 0
+    - parameters: [CartesianPositionTask.errorNorm]
+      direction: output
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/errorNorm
+          type: "std_msgs/Float64"
+          publish_rate: 100.0
+          queue_size: 2
+          latched: 0
+    - parameters: [CartesianPositionTask.errorDotNorm]
+      direction: output
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/CartesianPositionTask/errorDotNorm
+          type: "std_msgs/Float64"
+          publish_rate: 100.0
+          queue_size: 2
+          latched: 0
+
+# Parameters of JPosTask
+    - parameters: [JPosTask.error]
+      direction: output
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/JPosTask/error
+          type: "std_msgs/Float64MultiArray"
+          publish_rate: 100.0
+          queue_size: 2
+          latched: 0
+    - parameters: [JPosTask.errorDot]
+      direction: output
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/JPosTask/errorDot
+          type: "std_msgs/Float64MultiArray"
+          publish_rate: 100.0
+          queue_size: 2
+          latched: 0
+    - parameters: [JPosTask.actualPosition]
+      direction: output
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/JPosTask/actualPosition
+          type: "std_msgs/Float64MultiArray"
+          publish_rate: 100.0
+          queue_size: 2
+          latched: 0
+    - parameters: [JPosTask.kp]
+      direction: input
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/JPosTask/kp
+          type: "std_msgs/Float64MultiArray"
+    - parameters: [JPosTask.kd]
+      direction: input
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/JPosTask/kd
+          type: "std_msgs/Float64MultiArray"
+    - parameters: [JPosTask.goalPosition]
+      direction: input
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/JPosTask/goalPosition
+          type: "std_msgs/Float64MultiArray"
+    - parameters: [JPosTask.actualPosition]
+      direction: output
+      target:
+        middleware: ROS
+        properties:
+          topic: /wbc/JPosTask/actualPosition
+          type: "std_msgs/Float64MultiArray"
+          publish_rate: 100.0
+          queue_size: 2
+          latched: 0
+  # events:
+  #   - name: converged
+  #     expression: JPosTask.converged && JPosTask.quiescent
+  task_list:
+     - name: CartesianPositionTask
+       priority: 0
+     - name: JPosTask
+       priority: 1
+constraints:
+  - type: controlit/FlatContactConstraintSensed #must match a class name in constraint_plugins.xml
+    name: V1PinedConstraint
+    parameters:
+      - name: masterNodeName
+        type: string
+        value: "WaistRotator" #use to get node pointer in setup
+      - name: goalLocalCOP #formerly contact point, needs to be reasonable assumption of where COP could be
+        type: vector
+        value: [0.0, 0.0, 0.0]
+      - name: goalWorldCOP
+        type: vector
+        value: [-0.15, 0.0, 0.0]
+      - name: localCOP
+        type: vector
+        value: [0.0, 0.05, 0.0]
+      - name: worldCOP
+        type: vector
+        value: [-0.15, 0.0, 0.0]
+      - name: contactNormal
+        type: vector
+        value: [0.0, 0.0, 1.0]
+      - name: contactPlanePoint
+        type: vector
+        value: [0.1, 0.5, -0.03]
+      - name: rxnForceCOM
+        type: vector
+        value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      - name: reactionForceFrame
+        type: int
+        value: 0
+  # - type: controlit/FlatContactConstraintSensed #must match a class name in constraint_plugins.xml
+  #   name: RightFootConstraint
+  #   parameters:
+  #     - name: masterNodeName
+  #       type: string
+  #       value: "RightAnkle" #use to get node pointer in setup
+  #     - name: goalLocalCOP #formerly contact point, needs to be reasonable assumption of where COP could be
+  #       type: vector
+  #       value: [0.0, 0.0, 0.0]
+  #     - name: goalWorldCOP
+  #       type: vector
+  #       value: [-0.15, 0.0, 0.0]
+  #     - name: localCOP
+  #       type: vector
+  #       value: [0.0, 0.05, 0.0]
+  #     - name: worldCOP
+  #       type: vector
+  #       value: [-0.15, 0.0, 0.0]
+  #     - name: contactNormal
+  #       type: vector
+  #       value: [0.0, 0.0, 1.0]
+  #     - name: contactPlanePoint
+  #       type: vector
+  #       value: [0.1, 0.5, -0.03]
+  #     - name: rxnForceCOM
+  #       type: vector
+  #       value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  #     - name: reactionForceFrame
+  #       type: int
+  #       value: 0
+  # - type: controlit/FlatContactConstraintSensed #must match a class name in constraint_plugins.xml
+  #   name: LeftFootConstraint
+  #   parameters:
+  #     - name: masterNodeName
+  #       type: string
+  #       value: "LeftAnkle" #use to get node pointer in setup
+  #     - name: goalLocalCOP #formerly contact point, needs to be reasonable assumption of where COP could be
+  #       type: vector
+  #       value: [0.0, 0.0, 0.0]
+  #     - name: goalWorldCOP
+  #       type: vector
+  #       value: [-0.15, 0.0, 0.0]
+  #     - name: localCOP
+  #       type: vector
+  #       value: [0.0, 0.05, 0.0]
+  #     - name: worldCOP
+  #       type: vector
+  #       value: [-0.15, 0.0, 0.0]
+  #     - name: contactNormal
+  #       type: vector
+  #       value: [0.0, 0.0, 1.0]
+  #     - name: contactPlanePoint
+  #       type: vector
+  #       value: [0.1, 0.5, -0.03]
+  #     - name: rxnForceCOM
+  #       type: vector
+  #       value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  #     - name: reactionForceFrame
+  #       type: int
+  #       value: 0
+  # - type: controlit/FlatContactConstraintSensed #must match a class name in constraint_plugins.xml
+  #   name: HeadConstraint
+  #   parameters:
+  #     - name: masterNodeName
+  #       type: string
+  #       value: "UpperNeckExtensor" #use to get node pointer in setup
+  #     - name: goalLocalCOP #formerly contact point, needs to be reasonable assumption of where COP could be
+  #       type: vector
+  #       value: [0.0, 0.0, 0.0]
+  #     - name: goalWorldCOP
+  #       type: vector
+  #       value: [-0.15, 0.0, 0.0]
+  #     - name: localCOP
+  #       type: vector
+  #       value: [0.0, 0.05, 0.0]
+  #     - name: worldCOP
+  #       type: vector
+  #       value: [-0.15, 0.0, 0.0]
+  #     - name: contactNormal
+  #       type: vector
+  #       value: [0.0, 0.0, 1.0]
+  #     - name: contactPlanePoint
+  #       type: vector
+  #       value: [0.1, 0.5, -0.03]
+  #     - name: rxnForceCOM
+  #       type: vector
+  #       value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  #     - name: reactionForceFrame
+  #       type: int
+  #       value: 0
+constraint_set:
+  type: constraint_set
+  name: PinConstraintSet
+  active_constraints:
+    - name: V1PinedConstraint
+    # - name: RightFootConstraint
+    # - name: LeftFootConstraint
+    # - name: HeadConstraint

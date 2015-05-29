@@ -1,0 +1,28 @@
+<!--TODO: Make the class name, etc line up with constraints in the library-->
+<library path="lib/libcontrolit_constraint_library">
+
+  <class name="controlit/FlatContactConstraint" type="controlit::constraint_library::FlatContactConstraint" base_class_type="controlit::Constraint">
+    <description>
+      Flat contact constraint at a specified point
+    </description>
+  </class>
+
+  <class name="controlit/FlatContactConstraintSensed" type="controlit::constraint_library::FlatContactConstraintSensed" base_class_type="controlit::Constraint">
+    <description>
+      Flat contact constraint at sensed COP (eventually will replace FlatContactConstraint)
+    </description>
+  </class>
+
+  <class name="controlit/OmniWheelContactConstraint" type="controlit::constraint_library::OmniWheelContactConstraint" base_class_type="controlit::Constraint">
+    <description>
+      Rolling constraint, some parameters specified in a different frame to account for rolling reference frame
+    </description>
+  </class>
+
+  <class name="controlit/TransmissionConstraint" type="controlit::constraint_library::TransmissionConstraint" base_class_type="controlit::Constraint">
+    <description>
+      A transmission constraint that renders a joint unactuated.
+    </description>
+  </class>
+
+</library>

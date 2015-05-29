@@ -1,0 +1,5 @@
+{
+    "loggers": {
+        "rapid_logging": {"level": "INFO"}
+    }
+}

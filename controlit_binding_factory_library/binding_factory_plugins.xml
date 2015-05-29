@@ -1,0 +1,14 @@
+<library path="lib/libcontrolit_binding_factory_library">
+
+    <class name="controlit_binding_factory/BindingFactoryROS" type="controlit::binding_factory_library::BindingFactoryROS" base_class_type="controlit::BindingFactory">
+        <description>
+            A binding factory that produces bindings between ControlIt! parameters and ROS topics.
+        </description>
+    </class>
+
+    <class name="controlit_binding_factory/BindingFactorySM" type="controlit::binding_factory_library::BindingFactorySM" base_class_type="controlit::BindingFactory">
+        <description>
+            A binding factory that produces bindings between ControlIt! parameters and SM.
+        </description>
+    </class>
+</library>

@@ -1,0 +1,7 @@
+<launch>
+  <include file="$(find wbc)/tests/core/WBCParameterTest.launch"/>
+
+  <!-- The test -->
+  <test test-name="wbc_WBCParameterTest_Ros_Test" pkg="wbc" type="wbc_WBCParameterTest_Ros_Test"/>
+
+</launch>

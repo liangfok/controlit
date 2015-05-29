@@ -1,0 +1,113 @@
+header:
+    version: 1.0
+    description: wbc::skilldef
+
+tasks:
+  - task:
+      type: MyTestDRCTask # Must Match the name of the task in the task_library
+      name: MyTask1 # arbitrary name
+      output: NOTHING
+      events:
+        - event:
+            name: converged
+            parameters: ["error"]
+            expression: "(error < 1e-3) && (error >= 0.0)"
+        - event:
+            name: quiescent
+            parameters: ["error_dot"]
+            expression: "(error_dot > 1e-3) && (error_dot < 1e-3)"
+      parameters:
+        - parameter:
+            name: kp
+            value: [1.0, 1.0, 1.0, 0.1, 0.1, 0.1]
+        - parameter:
+            name: kd
+            value: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        - parameter:
+            name: maxvel
+            value: [5.0]  
+  - task:
+      type: opspace::CartesianPositionTask # Must Match the name of the task in the task_library
+      name: CartTask1 # arbitrary name
+      output: Actuator::Torque
+      events:
+        - event:
+            name: converged
+            parameters: ["error"]
+            expression: "(error < 1e-3) && (error >= 0.0)"
+        - event:
+            name: quiescent
+            parameters: ["error_dot"]
+            expression: "(error_dot > 1e-3) && (error_dot < 1e-3)"
+      parameters:
+        - parameter:
+            name: kp
+            value: [1.0, 1.0, 1.0, 0.1, 0.1, 0.1]
+        - parameter:
+            name: kd
+            value: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        - parameter:
+            name: maxvel
+            value: [5.0]
+  - task:
+      type: opspace::JPosTask # Must Match the name of the task in the task_library
+      name: JointTask1 # arbitrary name
+      output: Actuator::Torque
+      events:
+        - event:
+            name: converged
+            parameters: ["error"]
+            expression: "(error < 1e-3) && (error >= 0.0)"
+        - event:
+            name: quiescent
+            parameters: ["error_dot"]
+            expression: "(error_dot > 1e-3) && (error_dot < 1e-3)"
+      parameters:
+        - parameter:
+            name: kp
+            value: [10.0]
+        - parameter:
+            name: kd
+            value: [1.0]
+        - parameter:
+            name: maxvel
+            value: [1.0]
+compound_task:
+  name: reach # arbtirary name
+  inputs:
+    - input:
+       name: [CartTask1] # could be list of multiple if appropriate
+       binding: goal
+       topic: /default/pose/topic/name # could be re-allocated in code
+    - input: 
+       name: [CartTask1]
+       binding: feedback
+       topic: /robot/left_arm/endeffector/pose
+    - input:
+       name: [JointTask1]
+       binding: goal
+       value:
+         name: [j0, j1, j2]
+         position: [0.0, 0.0, 0.0]
+         velocity: [0.0, 0.0, 0.0]
+    - input:
+       name: [JointTask1]
+       binding: feedback
+       topic: /joint_state
+  actuation_matrix: # TODO: UT PLEASE UPDATE!!!!!!!!!!!!
+    - tasks:
+        names: [CartTask1, ...]
+        joints: [j0, j1, j2, j3, j4, j5, j6]
+    - tasks:
+        names: [JointTask1] 
+        joints: [j0, j1, j2]
+  events:
+    - event:
+        name: converged
+        expression: CartTask1.converged && JointTask1.quiescent
+    - event:
+        name: quiescent
+        expression: CartTask1.quiescent && JointTask1.quiescent
+  priority:
+     - tasks: [CartTask1] # high priority
+     - tasks: [JointTask1] # low priority

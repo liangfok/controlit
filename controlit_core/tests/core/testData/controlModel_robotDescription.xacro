@@ -1,0 +1,17 @@
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="control_model_test">
+    <!-- ======================================================= -->
+    <!-- DO NOT MODIFY URDF BY HAND! YOU ARE A FOOL IF YOU DO! -->
+    <!-- ======================================================= -->
+    <xacro:property name="mesh_root" value="model://V1/meshes/2013_05_16"/>
+
+    <xacro:include filename="$(find common_xacro)/xacro/generic_models.xacro" />
+    <xacro:include filename="$(find common_xacro)/xacro/common_properties.xacro" />
+    <xacro:include filename="$(find V1)/models/V1/xacro/arm/arm.xacro" />
+
+    <!-- ===== DUMMY 'BASE' LINK ==== -->
+    <xacro:virtual_link name="robot_base"
+                        origin_xyz="0 0 0"
+                        origin_rpy="0 0 0" />
+
+    <xacro:make_arm prefix="Right" reflect="1" arm_root_link="robot_base" />
+</robot>

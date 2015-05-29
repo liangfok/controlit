@@ -1,0 +1,45 @@
+<library path="lib/libcontrolit_task_library">
+
+    <class name="controlit/COMTask" type="controlit::task_library::COMTask" base_class_type="controlit::Task">
+        <description>
+            Controls the location of the center of mass.
+        </description>
+    </class>
+
+    <class name="controlit/CartesianPositionTask" type="controlit::task_library::CartesianPositionTask" base_class_type="controlit::Task">
+        <description>
+            Controls the location of a point on the robot in Cartesian space.
+        </description>
+    </class>
+
+    <class name="controlit/GenericInternalForceTask" type="controlit::task_library::GenericInternalForceTask" base_class_type="controlit::Task">
+        <description>
+            General class which to bind Fint and ref to a parameter -- absolutely no smarts at all.
+        </description>
+    </class>
+
+    <class name="controlit/JointLimitTask" type="controlit::task_library::JointLimitTask" base_class_type="controlit::Task">
+        <description>
+            Enforces joint limits in radians/meters
+        </description>
+    </class>
+
+    <class name="controlit/JointPositionTask" type="controlit::task_library::JointPositionTask" base_class_type="controlit::Task">
+        <description>
+            Controls the position of each joint in the robot.
+        </description>
+    </class>
+
+    <class name="controlit/OrientQuaternionTask" type="controlit::task_library::OrientQuaternionTask" base_class_type="controlit::Task">
+        <description>
+            Aligns the specified body to an input quaternion
+        </description>
+    </class>
+
+  <class name="controlit/OrientVectorToVectorTask" type="controlit::task_library::OrientVectorToVectorTask" base_class_type="controlit::Task">
+    <description>
+      A task to align a body frame vector with a world frame vector, accounting for direction
+    </description>
+  </class>
+
+</library>
