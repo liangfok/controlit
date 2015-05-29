@@ -45,14 +45,21 @@ Note that all but one of the lines above are commented out. The bottom three lin
 
 ### Add ControlIt! to the ROS Workspace ###
 
-The following instructions assume you are using a ROS workspace located in ~/controlit_workspace:
+The following instructions assume you are using a ROS workspace located in ~/controlit_workspace.
 
-    $ cd ~/controlit_workspace/src
-    $ git clone git@github.com:liangfok/controlit.git
-    $ git clone git@github.com:liangfok/controlit_models.git
-    $ git clone git@github.com:liangfok/controlit_configs.git
-    $ git clone git@github.com:liangfok/ros_shared_memory_interface.git
-    $ git clone ssh://hg@bitbucket.org/cfok/rbdl2
+Using your favorite text editor, create the text file ~/controlit_workspace/.rosinstall containing the following text:
+
+    - setup-file: {local-name: /opt/ros/indigo/setup.sh}
+    - git: {local-name: src/controlit, uri: 'git@github.com:liangfok/controlit.git', version: master}
+    - git: {local-name: src/controlit_models, uri: 'git@github.com:liangfok/controlit_models.git', version: master}
+    - git: {local-name: src/controlit_configs, uri: 'git@github.com:liangfok/controlit_configs.git', version: master}
+    - hg: {local-name: src/rbdl2, uri: 'ssh://hg@bitbucket.org/cfok/rbdl2'}
+    - git: {local-name: src/ros_shared_memory_interface, uri: 'git@github.com:liangfok/ros_shared_memory_interface.git', version: master}
+
+Exit the text editor and update your workspace:
+
+    $ cd ~/controlit_workspace
+    $ wstool update
 
 ### Install RBDL ###
 
