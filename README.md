@@ -62,6 +62,11 @@ Exit the text editor and update your workspace:
     $ cd ~/controlit_workspace
     $ wstool update
 
+You can check the status of your workspace by executing:
+
+    $ cd ~/controlit_workspace
+    $ wstool info
+
 ### Install RBDL ###
 
 RBDL provides various dynamics and kinematics algorithms that are used by
