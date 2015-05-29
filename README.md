@@ -6,11 +6,11 @@
   * [Installation](#installation)
     * [Create a ROS Workspace](#create-a-ros-workspace)
     * [Add ControlIt! to the ROS Workspace](#add-controlit-to-the-ros-workspace)
+    * [Enable Gazebo Plugins and Models](#enable-gazebo-plugins-and-models)
     * [Install RBDL](#install-rbdl)
     * [Install YAML 0.3.0](#install-yaml-030)
     * [Install Additional Dependencies](#install-additional-dependencies)
     * [Compile ControlIt!](#compile-controlit)
-    * [Enable Gazebo Plugins and Models](#enable-gazebo-plugins-and-models)
     * [Configure Shared Memory](#configure-shared-memory)
   * [Run Demonstration Simulations](#run-demonstration-simulations)
 
@@ -67,6 +67,18 @@ You can check the status of your workspace by executing:
     $ cd ~/controlit_workspace
     $ wstool info
 
+### Enable Gazebo Plugins and Models ###
+
+Now that you have checked out all of the repositories, you can enable the Gazebo plugins and models that are used by ControlIt!. Edit ~/.bashrc and update the section related to ControlIt! to be the following:
+
+    # Setup ControlIt! ROS workspace
+    source $HOME/controlit_workspace/devel/setup.bash
+    source `rospack find controlit_environment_config`/setup.sh
+    source `rospack find controlit_models`/setup.sh
+    source `rospack find controlit_configs`/setup.sh
+
+Close and re-open your terminals for the settings to apply.
+
 ### Install RBDL ###
 
 RBDL provides various dynamics and kinematics algorithms that are used by
@@ -106,18 +118,6 @@ To compile ControlIt!, execute:
     $ cd ~/controlit_workspace
     $ rm -rf build devel              // optional, for a clean re-compilation of everything
     $ catkin_make
-
-## Enable Gazebo Plugins and Models ##
-
-Edit ~/.bashrc and update the section related to ControlIt! to be the following:
-
-    # Setup ControlIt! ROS workspace
-    source $HOME/controlit_workspace/devel/setup.bash
-    source `rospack find controlit_environment_config`/setup.sh
-    source `rospack find controlit_models`/setup.sh
-    source `rospack find controlit_configs`/setup.sh
-
-Close and re-open your terminals for the settings to apply.
 
 ## Configure Shared Memory ##
 
