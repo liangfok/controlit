@@ -48,7 +48,7 @@ Note that all but one of the lines above are commented out. The bottom three lin
 
 The following instructions assume you are using a ROS workspace located in ~/controlit_workspace.
 
-Using your favorite text editor, create the text file ~/controlit_workspace/.rosinstall containing the following text:
+Using your favorite text editor, create the text file ~/controlit_workspace/.rosinstall containing the following text (Note: to avoid permission errors, you need to upload your public SSH key to your [github](https://github.com/settings/ssh "github SSH settings") and [bitbucket](https://confluence.atlassian.com/display/BITBUCKET/Add+an+SSH+key+to+an+account "Instructions for adding SSH key to bitbucket account") accounts).
 
     - setup-file: {local-name: /opt/ros/indigo/setup.sh}
     - git: {local-name: src/controlit, uri: 'git@github.com:liangfok/controlit.git', version: master}
