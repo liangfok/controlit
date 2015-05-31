@@ -57,6 +57,15 @@ Using your favorite text editor, create the text file ~/controlit_workspace/.ros
     - hg: {local-name: src/rbdl2, uri: 'ssh://hg@bitbucket.org/cfok/rbdl2'}
     - git: {local-name: src/ros_shared_memory_interface, uri: 'git@github.com:liangfok/ros_shared_memory_interface.git', version: master}
 
+If you are unable or unwilling to upload your public SSH key to your github and bitbucket accounts, use the following settings to use HTTP rather than SSH to download the software:
+
+    - setup-file: {local-name: /opt/ros/indigo/setup.sh}
+    - git: {local-name: src/controlit, uri: 'https://github.com/liangfok/controlit.git', version: master}
+    - git: {local-name: src/controlit_models, uri: 'https://github.com/liangfok/controlit_models.git', version: master}
+    - git: {local-name: src/controlit_configs, uri: 'https://github.com/liangfok/controlit_configs.git', version: master}
+    - hg: {local-name: src/rbdl2, uri: 'https://bitbucket.org/cfok/rbdl2'}
+    - git: {local-name: src/ros_shared_memory_interface, uri: 'https://github.com/liangfok/ros_shared_memory_interface.git', version: master}
+
 Exit the text editor and update your workspace:
 
     $ cd ~/controlit_workspace
