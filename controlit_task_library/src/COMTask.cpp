@@ -43,17 +43,17 @@ COMTask::COMTask() :
     // Declare the parameters
     declareParameter("goalPosition", &goalPosition_);
     declareParameter("goalVelocity", &goalVelocity_);
+    declareParameter("projection", &projection_);
+
     paramFrameProjectedCOM = declareParameter("projectedPosition", &frameProjectedCOM_);
     paramWorldProjectedCOM = declareParameter("projectedWorldPosition", &worldProjectedCOM_);
     paramFrameProjectedCOMVel = declareParameter("projectedVelocity", &frameProjectedCOMVel_);
     paramWorldProjectedCOMVel = declareParameter("projectedWorldVelocity", &worldProjectedCOMVel_);
     paramWorldCOM = declareParameter("worldCOM", &worldCOM_);
     paramWorldCOMVel = declareParameter("worldCOMVel", &worldCOMVel_);
-    declareParameter("projection", &projection_);
-    declareParameter("jointNameList", &jointNameList_);
-  
+
     // Create the PD controller
-    controller.reset( PDControllerFactory::create(SaturationPolicy::ComponentWiseVel ) );
+    controller.reset(PDControllerFactory::create(SaturationPolicy::ComponentWiseVel));
   
     // Add controller parameters to this task
     controller->declareParameters(this);
@@ -135,9 +135,37 @@ bool COMTask::init(ControlModel & model)
         }
     }
   
+    addDefaultBindings();
+
     return Task::init(model);
 }
 
+void COMTask::addDefaultBindings()
+{
+    // CONTROLIT_INFO << "Method Called!\n"
+    //     << "  - useDefaultBindings = " << useDefaultBindings;
+    if (!useDefaultBindings) return;
+
+    if (!hasBinding("goalPosition"))     addParameter(createROSInputBinding("goalPosition", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("goalVelocity"))     addParameter(createROSInputBinding("goalVelocity", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("kp"))               addParameter(createROSInputBinding("kp", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("kd"))               addParameter(createROSInputBinding("kd", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("enabled"))          addParameter(createROSInputBinding("enabled", "std_msgs/Int32"));
+    if (!hasBinding("tare"))             addParameter(createROSInputBinding("tare", "std_msgs/Int32"));
+    if (!hasBinding("projection"))       addParameter(createROSInputBinding("projection", "std_msgs/Float64MultiArray"));
+
+    if (!hasBinding("error"))                   addParameter(createROSOutputBinding("error", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("errorDot"))                addParameter(createROSOutputBinding("errorDot", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("errorNorm"))               addParameter(createROSOutputBinding("errorNorm", "std_msgs/Float64"));
+    if (!hasBinding("errorDotNorm"))            addParameter(createROSOutputBinding("errorDotNorm", "std_msgs/Float64"));
+    if (!hasBinding("projectedPosition"))       addParameter(createROSOutputBinding("projectedPosition", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("projectedWorldPosition"))  addParameter(createROSOutputBinding("projectedWorldPosition", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("projectedVelocity"))       addParameter(createROSOutputBinding("projectedVelocity", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("projectedWorldVelocity"))  addParameter(createROSOutputBinding("projectedWorldVelocity", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("worldCOM"))                addParameter(createROSOutputBinding("worldCOM", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("worldCOMVel"))             addParameter(createROSOutputBinding("worldCOMVel", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("PDCommand"))               addParameter(createROSOutputBinding("PDCommand", "std_msgs/Float64MultiArray"));
+}
 bool COMTask::updateStateImpl(ControlModel * model, TaskState * taskState)
 {
     PRINT_DEBUG_STATEMENT("Method called!")
