@@ -31,7 +31,8 @@
     <!-- Use test_depend for packages you need only for testing: -->
     <!--   <test_depend>gtest</test_depend> -->
     <buildtool_depend>catkin</buildtool_depend>
-    
+
+    <depend>roscpp</depend>
     <depend>cmake_modules</depend>
     <depend>controlit_dependency_addons</depend>
     

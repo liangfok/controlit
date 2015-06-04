@@ -9,6 +9,7 @@ project(controlit_udp)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+    roscpp
     controlit_cmake
     cmake_modules
 )
@@ -35,7 +36,7 @@ find_package(Rbdl REQUIRED)
 catkin_package(
    INCLUDE_DIRS include
    LIBRARIES ${PROJECT_NAME}
-   CATKIN_DEPENDS controlit_cmake cmake_modules
+   CATKIN_DEPENDS roscpp controlit_cmake cmake_modules
 #  DEPENDS system_lib
 )
 
@@ -45,7 +46,10 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include)
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+)
 
 ## Declare a cpp library
 file(GLOB SRCS src/*.cpp)

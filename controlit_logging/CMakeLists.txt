@@ -5,18 +5,12 @@ project(controlit_logging)
 ## ControlIt! ##
 ################
 
-# message("** controlit_cmake_DIR: " ${controlit_cmake_DIR})
-list(APPEND CMAKE_MODULE_PATH ${controlit_cmake_DIR}/../../../../src/controlit/controlit_cmake/cmake)
-# message("** CMAKE_MODULE_PATH: " ${CMAKE_MODULE_PATH})
-
-include(controlitbuild)
-controlit_build_init()
-
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS  
-	cmake_modules
+	roscpp
+        cmake_modules
 	controlit_cmake
 	controlit_dependency_addons)
 
@@ -42,7 +36,7 @@ find_package(Eigen REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
-   CATKIN_DEPENDS controlit_dependency_addons
+  CATKIN_DEPENDS roscpp controlit_dependency_addons
 #  DEPENDS system_lib
 )
 
@@ -54,6 +48,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 	include
+        ${catkin_INCLUDE_DIRS}
 	${EIGEN_INCLUDE_DIRS}
 	${controlit_dependency_addons_INCLUDE_DIRS}
 )
