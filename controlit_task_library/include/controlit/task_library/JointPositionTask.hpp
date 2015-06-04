@@ -102,7 +102,7 @@ protected:
     // END DREAMER-SPECIFIC CODE!
     // ============================================================================
   
-private: 
+private:
     void addDefaultBindings();
 };
 
