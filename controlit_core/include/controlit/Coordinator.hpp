@@ -427,6 +427,7 @@ private:
      */
     ros::ServiceServer getControllerConfigService;
 
+    bool isFirstState;
     bool isFirstCommand;
 };
 

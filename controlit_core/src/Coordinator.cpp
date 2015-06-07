@@ -79,6 +79,7 @@ Coordinator::Coordinator() :
     robotInterface(nullptr),
     compoundTask(nullptr),
     controller(nullptr),
+    isFirstState(true),
     isFirstCommand(true)
 {
 }
@@ -375,6 +376,24 @@ void Coordinator::servoUpdate()
     {
         // updateLatencyStat.cancelTimer();
         return;
+    }
+    else
+    {
+        if (isFirstState)
+        {
+            char buffer[30];
+            struct timeval tv;
+            time_t curtime;
+
+            gettimeofday(&tv, NULL); 
+            curtime=tv.tv_sec;
+          
+            strftime(buffer,30,"%m-%d-%Y  %T.", localtime(&curtime));
+
+            CONTROLIT_INFO_RT << "Receiving first state at time " << buffer << tv.tv_usec;
+
+            isFirstState = false;
+        }
     }
 
     latencyRead = servoLatencyTimer->getTime();
