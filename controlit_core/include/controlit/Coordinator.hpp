@@ -426,6 +426,8 @@ private:
      * A service that returns the current controller configuration.
      */
     ros::ServiceServer getControllerConfigService;
+
+    bool isFirstCommand;
 };
 
 } // namespace controlit

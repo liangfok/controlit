@@ -22,6 +22,7 @@
 
 #include <limits>
 #include <typeinfo>
+#include <time.h>
 
 #include <controlit/Constraint.hpp>
 #include <controlit/ConstraintSet.hpp>
@@ -77,7 +78,8 @@ Coordinator::Coordinator() :
     servoClock(nullptr),
     robotInterface(nullptr),
     compoundTask(nullptr),
-    controller(nullptr)
+    controller(nullptr),
+    isFirstCommand(true)
 {
 }
 
@@ -481,6 +483,21 @@ void Coordinator::servoUpdate()
     }
     else
     {
+        if (isFirstCommand)
+        {
+            char buffer[30];
+            struct timeval tv;
+            time_t curtime;
+
+            gettimeofday(&tv, NULL); 
+            curtime=tv.tv_sec;
+          
+            strftime(buffer,30,"%m-%d-%Y  %T.", localtime(&curtime));
+
+            CONTROLIT_INFO_RT << "Sending first command at time " << buffer << tv.tv_usec;
+            isFirstCommand = false;
+        }
+        
         // Write command to the robot
         robotInterface->write(command);
     }
