@@ -68,7 +68,12 @@ bool OdometryStateReceiverSM::init(ros::NodeHandle & nh, RTControlModel * model)
 
     PRINT_DEBUG_STATEMENT("Subscribing to odometry topic...");
     odometrySubscriber.subscribe(odometryTopic, boost::bind(&OdometryStateReceiverSM::odometryMessageCallback, this, _1));
-
+    
+    // Wait for message to arrive to ensure connection 
+    // is initialized prior to starting the controller.
+    nav_msgs::Odometry tmpMsg;
+    odometrySubscriber.waitForMessage(tmpMsg);
+    
     return true;
 }
 

@@ -101,11 +101,15 @@ bool RobotInterfaceSM::init(ros::NodeHandle & nh, RTControlModel * model)
     //---------------------------------------------------------------------------------
 
     cmdPublisher.advertise("/cmd");
+    
     rttTxPublisher.advertise("/rtt_tx");
 
     rttRxSubscriber.subscribe("/rtt_rx", boost::bind(&RobotInterfaceSM::rttCallback, this, _1));
     robotStateSubscriber.subscribe("/joint_states", boost::bind(&RobotInterfaceSM::jointStateCallback, this, _1));
     
+    rttRxSubscriber.waitForMessage(rttRxMsg);
+    robotStateSubscriber.waitForMessage(jointStateMsg);
+
     // int checkCount = 0;
 
 
@@ -154,7 +158,16 @@ bool RobotInterfaceSM::init(ros::NodeHandle & nh, RTControlModel * model)
 
     PRINT_INFO_STATEMENT("Creating and initializing the odometry state receiver...");
     odometryStateReceiver.reset(new OdometryStateReceiverSM());
-    return odometryStateReceiver->init(nh, model);
+    if (odometryStateReceiver->init(nh, model))
+    {
+        CONTROLIT_INFO << "Publishing dummy cmd and RTT TX messages...";
+        cmdPublisher.publish(torqueCmdMsg);  // Send a dumy message to initialize shared memory connection
+        rttTxPublisher.publish(currentRTTMsg);  // Send a dumy message to initialize shared memory connection
+        return true;
+    } else
+        return false;
+
+
 }
 
 void RobotInterfaceSM::rttCallback(std_msgs::Int64 & msg)
