@@ -102,6 +102,8 @@ private:
      * The topic on which to receive odometry information.
      */
     std::string odometryTopic;
+
+    bool isFirstReception;
 };
 
 } // namespace robot_interface_library

@@ -46,10 +46,18 @@ namespace robot_interface_library {
 #define PRINT_RECEIVED_STATE 0
 #define PRINT_COMMAND 0
 
+// Parameters for shared memory subscribers
+#define LISTEN_TO_ROS_TOPIC false
+#define USE_POLLING false
+
 RobotInterfaceSM::RobotInterfaceSM() :
     RobotInterface(), // Call super-class' constructor
     receivedRobotState(false),
-    rcvdJointState(false)
+    robotStateSubscriber(LISTEN_TO_ROS_TOPIC, USE_POLLING),
+    rttRxSubscriber(LISTEN_TO_ROS_TOPIC, USE_POLLING),
+    rcvdJointState(false),
+    isFirstReceptionState(true),
+    isFirstReceptionRTT(true)
 {
 }
 
@@ -172,19 +180,39 @@ bool RobotInterfaceSM::init(ros::NodeHandle & nh, RTControlModel * model)
 
 void RobotInterfaceSM::rttCallback(std_msgs::Int64 & msg)
 {
-    rttRxMsgMutex.lock();
-    rttRxMsg = msg;
-    rttRxMsgMutex.unlock();
+    CONTROLIT_INFO_RT << "Method called!";
+
+    if (isFirstReceptionRTT)
+    {
+        CONTROLIT_INFO_RT << "Received initial RTT message";
+        isFirstReceptionRTT = false;
+    }
+    else
+    {
+        rttRxMsgMutex.lock();
+        rttRxMsg = msg;
+        rttRxMsgMutex.unlock();
+    }
 }
 
 void RobotInterfaceSM::jointStateCallback(sensor_msgs::JointState & msg)
 {
-    jointStateMutex.lock();
+    CONTROLIT_INFO_RT << "Method called!";
 
-    jointStateMsg = msg;
-    rcvdJointState = true;
+    if (isFirstReceptionState)
+    {
+        CONTROLIT_INFO_RT << "Received initial robot state";
+        isFirstReceptionState = false;
+    }
+    else
+    {
+        jointStateMutex.lock();
+
+        jointStateMsg = msg;
+        rcvdJointState = true;
     
-    jointStateMutex.unlock();
+        jointStateMutex.unlock();
+    }
 }
 
 bool RobotInterfaceSM::read(controlit::RobotState & latestRobotState, bool block)

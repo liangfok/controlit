@@ -182,6 +182,16 @@ private:
      * The message containing the current RTT.  To be transmitted to the robot.
      */
     std_msgs::Int64 currentRTTMsg;
+
+    /*!
+     * Whether the initial state message was received.
+     */
+    bool isFirstReceptionState;
+
+    /*!
+     * Whether the initial RTT message was received.
+     */
+    bool isFirstReceptionRTT;
 };
 
 } // namespace robot_interface_library
