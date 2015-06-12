@@ -77,8 +77,8 @@ bool OdometryStateReceiverSM::init(ros::NodeHandle & nh, RTControlModel * model)
     
     // Wait for message to arrive to ensure connection 
     // is initialized prior to starting the controller.
-    nav_msgs::Odometry tmpMsg;
-    odometrySubscriber.waitForMessage(tmpMsg);
+    // nav_msgs::Odometry tmpMsg;
+    // odometrySubscriber.waitForMessage(tmpMsg);
     
     return true;
 }
@@ -126,7 +126,7 @@ bool OdometryStateReceiverSM::getOdometry(controlit::RobotState & latestRobotSta
 // NOTE: Odometry data is used to set the 6 virtual degrees of freedom.
 void OdometryStateReceiverSM::odometryMessageCallback(nav_msgs::Odometry & odom)
 {
-    CONTROLIT_INFO_RT << "Method called!";
+    // CONTROLIT_INFO_RT << "Method called!";
     if (isFirstReception)
     {
         CONTROLIT_INFO_RT << "Received initial odometry message.";

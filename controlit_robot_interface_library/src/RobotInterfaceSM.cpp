@@ -56,8 +56,10 @@ RobotInterfaceSM::RobotInterfaceSM() :
     robotStateSubscriber(LISTEN_TO_ROS_TOPIC, USE_POLLING),
     rttRxSubscriber(LISTEN_TO_ROS_TOPIC, USE_POLLING),
     rcvdJointState(false),
-    isFirstReceptionState(true),
-    isFirstReceptionRTT(true)
+    rcvdInitStateMsg(false),
+    rcvdInitRTTMsg(false),
+    rcvdFirstStateMsg(false),
+    rcvdFirstRTTMsg(false)
 {
 }
 
@@ -109,14 +111,13 @@ bool RobotInterfaceSM::init(ros::NodeHandle & nh, RTControlModel * model)
     //---------------------------------------------------------------------------------
 
     cmdPublisher.advertise("/cmd");
-    
     rttTxPublisher.advertise("/rtt_tx");
 
     rttRxSubscriber.subscribe("/rtt_rx", boost::bind(&RobotInterfaceSM::rttCallback, this, _1));
     robotStateSubscriber.subscribe("/joint_states", boost::bind(&RobotInterfaceSM::jointStateCallback, this, _1));
     
-    rttRxSubscriber.waitForMessage(rttRxMsg);
-    robotStateSubscriber.waitForMessage(jointStateMsg);
+    // rttRxSubscriber.waitForMessage(rttRxMsg);
+    // robotStateSubscriber.waitForMessage(jointStateMsg);
 
     // int checkCount = 0;
 
@@ -164,7 +165,7 @@ bool RobotInterfaceSM::init(ros::NodeHandle & nh, RTControlModel * model)
     // Initialize odometry receiver.
     //---------------------------------------------------------------------------------
 
-    PRINT_INFO_STATEMENT("Creating and initializing the odometry state receiver...");
+    CONTROLIT_INFO << "Creating and initializing the odometry state receiver...";
     odometryStateReceiver.reset(new OdometryStateReceiverSM());
     if (odometryStateReceiver->init(nh, model))
     {
@@ -180,15 +181,18 @@ bool RobotInterfaceSM::init(ros::NodeHandle & nh, RTControlModel * model)
 
 void RobotInterfaceSM::rttCallback(std_msgs::Int64 & msg)
 {
-    CONTROLIT_INFO_RT << "Method called!";
-
-    if (isFirstReceptionRTT)
+    if (!rcvdInitRTTMsg)
     {
-        CONTROLIT_INFO_RT << "Received initial RTT message";
-        isFirstReceptionRTT = false;
+        CONTROLIT_INFO_RT << "Received initial RTT message at time " << getTimer()->getTime() << "!";
+        rcvdInitRTTMsg = true;
     }
     else
     {
+        if (!rcvdFirstRTTMsg)
+        {
+            CONTROLIT_INFO_RT << "Received first RTT message at time " << getTimer()->getTime() << "!";
+            rcvdFirstRTTMsg = true;
+        }
         rttRxMsgMutex.lock();
         rttRxMsg = msg;
         rttRxMsgMutex.unlock();
@@ -197,15 +201,19 @@ void RobotInterfaceSM::rttCallback(std_msgs::Int64 & msg)
 
 void RobotInterfaceSM::jointStateCallback(sensor_msgs::JointState & msg)
 {
-    CONTROLIT_INFO_RT << "Method called!";
-
-    if (isFirstReceptionState)
+    if (!rcvdInitStateMsg)
     {
-        CONTROLIT_INFO_RT << "Received initial robot state";
-        isFirstReceptionState = false;
+        CONTROLIT_INFO_RT << "Received initial state message at time " << getTimer()->getTime() << "!";
+        rcvdInitStateMsg = true;
     }
     else
     {
+        if (!rcvdFirstStateMsg)
+        {
+            CONTROLIT_INFO_RT << "Received first state message at time " << getTimer()->getTime() << "!";
+            rcvdFirstStateMsg = true;
+        }
+
         jointStateMutex.lock();
 
         jointStateMsg = msg;

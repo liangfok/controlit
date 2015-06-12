@@ -186,12 +186,24 @@ private:
     /*!
      * Whether the initial state message was received.
      */
-    bool isFirstReceptionState;
+    bool rcvdInitStateMsg;
 
     /*!
      * Whether the initial RTT message was received.
      */
-    bool isFirstReceptionRTT;
+    bool rcvdInitRTTMsg;
+
+    /*!
+     * Whether the first valid state message was received.
+     */
+    bool rcvdFirstStateMsg;
+
+    /*!
+     * Whether the first valid RTT message was received.
+     */
+    bool rcvdFirstRTTMsg;
+
+
 };
 
 } // namespace robot_interface_library
