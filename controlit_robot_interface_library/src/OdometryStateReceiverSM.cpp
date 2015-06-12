@@ -48,7 +48,8 @@ OdometryStateReceiverSM::OdometryStateReceiverSM() :
                                             // that prevents this variable from being used by the
                                             // controller until after real odometry data is received.
     odometrySubscriber(LISTEN_TO_ROS_TOPIC, USE_POLLING),
-    isFirstReception(true)
+    rcvdInitOdomMsg(false),
+    rcvdFirstOdomMsg(false)
 {
 }
 
@@ -127,13 +128,18 @@ bool OdometryStateReceiverSM::getOdometry(controlit::RobotState & latestRobotSta
 void OdometryStateReceiverSM::odometryMessageCallback(nav_msgs::Odometry & odom)
 {
     // CONTROLIT_INFO_RT << "Method called!";
-    if (isFirstReception)
+    if (!rcvdInitOdomMsg)
     {
         CONTROLIT_INFO_RT << "Received initial odometry message.";
-        isFirstReception = false;
+        rcvdInitOdomMsg = true;
     }
     else
     {
+        if (!rcvdFirstOdomMsg)
+        {
+            CONTROLIT_INFO_RT << "Received first odometry message.";
+            rcvdFirstOdomMsg = true;       
+        }
         // Assuming odometry information in the correct frame...
         Vector x(3);
         x(0) = odom.pose.pose.position.x;

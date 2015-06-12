@@ -183,14 +183,14 @@ void RobotInterfaceSM::rttCallback(std_msgs::Int64 & msg)
 {
     if (!rcvdInitRTTMsg)
     {
-        CONTROLIT_INFO_RT << "Received initial RTT message at time " << getTimer()->getTime() << "!";
+        CONTROLIT_INFO_RT << "Received initial RTT message!";
         rcvdInitRTTMsg = true;
     }
     else
     {
         if (!rcvdFirstRTTMsg)
         {
-            CONTROLIT_INFO_RT << "Received first RTT message at time " << getTimer()->getTime() << "!";
+            CONTROLIT_INFO_RT << "Received first RTT message!";
             rcvdFirstRTTMsg = true;
         }
         rttRxMsgMutex.lock();
@@ -203,14 +203,14 @@ void RobotInterfaceSM::jointStateCallback(sensor_msgs::JointState & msg)
 {
     if (!rcvdInitStateMsg)
     {
-        CONTROLIT_INFO_RT << "Received initial state message at time " << getTimer()->getTime() << "!";
+        CONTROLIT_INFO_RT << "Received initial state message!";
         rcvdInitStateMsg = true;
     }
     else
     {
         if (!rcvdFirstStateMsg)
         {
-            CONTROLIT_INFO_RT << "Received first state message at time " << getTimer()->getTime() << "!";
+            CONTROLIT_INFO_RT << "Received first state message!";
             rcvdFirstStateMsg = true;
         }
 
