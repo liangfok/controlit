@@ -95,45 +95,33 @@ bool RobotInterface::init(ros::NodeHandle & nh, RTControlModel * model)
     //---------------------------------------------------------------------------------
     // Initialize the publishers of the latest robot state and command.
     //---------------------------------------------------------------------------------
-    if(statePublisher.trylock())
-    {
-        const std::vector<std::string> & jointNames = model->get()->getRealJointNamesVector();
+    while (!statePublisher.trylock()) usleep(200);
 
-        for (auto & name : jointNames)
-        {
-            statePublisher.msg_.name.push_back(name);
-            statePublisher.msg_.position.push_back(0.0);  // allocate memory for the joint states
-            statePublisher.msg_.velocity.push_back(0.0);
-            statePublisher.msg_.effort.push_back(0.0);
-        }
+    const std::vector<std::string> & realJointNames = model->get()->getRealJointNamesVector();
 
-        statePublisher.unlockAndPublish();
-    }
-    else
+    for (auto & name : realJointNames)
     {
-        CONTROLIT_ERROR << "Unable to initialize the state publisher!";
-        return false;
+        statePublisher.msg_.name.push_back(name);
+        statePublisher.msg_.position.push_back(0.0);  // allocate memory for the joint states
+        statePublisher.msg_.velocity.push_back(0.0);
+        statePublisher.msg_.effort.push_back(0.0);
     }
 
-    if(commandPublisher.trylock())
-    {
-        const std::vector<std::string> & jointNames = model->get()->getActuatedJointNamesVector();
+    statePublisher.unlockAndPublish();
 
-        for (auto & name : jointNames)
-        {
-            commandPublisher.msg_.name.push_back(name);
-            commandPublisher.msg_.position.push_back(0.0);  // allocate memory for the joint states
-            commandPublisher.msg_.velocity.push_back(0.0);
-            commandPublisher.msg_.effort.push_back(0.0);
-        }
+    while (!commandPublisher.trylock()) usleep(200);
 
-        commandPublisher.unlockAndPublish();
-    }
-    else
+    const std::vector<std::string> & actualJointNames = model->get()->getActuatedJointNamesVector();
+
+    for (auto & name : actualJointNames)
     {
-        CONTROLIT_ERROR << "Unable to initialize the command publisher!";
-        return false;
+        commandPublisher.msg_.name.push_back(name);
+        commandPublisher.msg_.position.push_back(0.0);  // allocate memory for the joint states
+        commandPublisher.msg_.velocity.push_back(0.0);
+        commandPublisher.msg_.effort.push_back(0.0);
     }
+
+    commandPublisher.unlockAndPublish();
 
     ros::param::param<bool>("controlit/use_ros_timer", useROSTimer, true);
 
