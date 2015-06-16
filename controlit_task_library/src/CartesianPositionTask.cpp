@@ -65,7 +65,7 @@ void CartesianPositionTask::addDefaultBindings()
     if (!hasBinding("goalVelocity")) addParameter(createROSInputBinding("goalVelocity", "std_msgs/Float64MultiArray"));
     if (!hasBinding("kp"))           addParameter(createROSInputBinding("kp", "std_msgs/Float64"));
     if (!hasBinding("kd"))           addParameter(createROSInputBinding("kd", "std_msgs/Float64"));
-    if (!hasBinding("enabled"))      addParameter(createROSInputBinding("enabled", "std_msgs/Int32"));
+    if (!hasBinding("enableState"))  addParameter(createROSInputBinding("enableState", "std_msgs/Int32"));
     if (!hasBinding("tare"))         addParameter(createROSInputBinding("tare", "std_msgs/Int32"));
     if (!hasBinding("bodyName"))     addParameter(createROSInputBinding("bodyName", "std_msgs/String"));
     if (!hasBinding("controlPoint")) addParameter(createROSInputBinding("controlPoint", "std_msgs/Float64MultiArray"));

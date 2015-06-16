@@ -150,7 +150,7 @@ void COMTask::addDefaultBindings()
     if (!hasBinding("goalVelocity"))     addParameter(createROSInputBinding("goalVelocity", "std_msgs/Float64MultiArray"));
     if (!hasBinding("kp"))               addParameter(createROSInputBinding("kp", "std_msgs/Float64MultiArray"));
     if (!hasBinding("kd"))               addParameter(createROSInputBinding("kd", "std_msgs/Float64MultiArray"));
-    if (!hasBinding("enabled"))          addParameter(createROSInputBinding("enabled", "std_msgs/Int32"));
+    if (!hasBinding("enableState"))      addParameter(createROSInputBinding("enableState", "std_msgs/Int32"));
     if (!hasBinding("tare"))             addParameter(createROSInputBinding("tare", "std_msgs/Int32"));
     if (!hasBinding("projection"))       addParameter(createROSInputBinding("projection", "std_msgs/Float64MultiArray"));
 

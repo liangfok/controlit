@@ -97,7 +97,7 @@ void JointPositionTask::addDefaultBindings()
     if (!hasBinding("goalAcceleration")) addParameter(createROSInputBinding("goalAcceleration", "std_msgs/Float64MultiArray"));
     if (!hasBinding("kp"))               addParameter(createROSInputBinding("kp", "std_msgs/Float64MultiArray"));
     if (!hasBinding("kd"))               addParameter(createROSInputBinding("kd", "std_msgs/Float64MultiArray"));
-    if (!hasBinding("enabled"))          addParameter(createROSInputBinding("enabled", "std_msgs/Int32"));
+    if (!hasBinding("enableState"))      addParameter(createROSInputBinding("enableState", "std_msgs/Int32"));
     if (!hasBinding("tare"))             addParameter(createROSInputBinding("tare", "std_msgs/Int32"));
 
     if (!hasBinding("error"))                   addParameter(createROSOutputBinding("error", "std_msgs/Float64MultiArray"));

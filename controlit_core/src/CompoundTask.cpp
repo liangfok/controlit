@@ -119,24 +119,25 @@ bool CompoundTask::loadConfig(YAML::Node const& doc)
         {
             std::string name;
             unsigned int priority;
-            int enabled;
+            int enableState;
       
             (*it)["name"] >> name;
             (*it)["priority"] >> priority;
-            if ((*it).FindValue("enabled"))
+            if ((*it).FindValue("enableState"))
             {
-                (*it)["enabled"] >> enabled;
+                (*it)["enableState"] >> enableState;
             }
             else
             {
-                CONTROLIT_PR_INFO_RT << "No enabled specification found for task '" << name << "'. Assuming enabled = true.";
-                enabled = 1;
+                CONTROLIT_PR_INFO_RT << "No enableState specification found for task '" << name << "'. "
+                                     << "Assuming enableState = EnableState::ENABLED.";
+                enableState = EnableState::ENABLED;
             }
       
             auto tuple = taskList.find(name);
             if (tuple != taskList.end())
             {
-                tuple->second->lookupParameter("enabled")->set(enabled);
+                tuple->second->lookupParameter("enableState")->set(enableState);
                 addTask(tuple->second, priority);
             }
             else
