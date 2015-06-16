@@ -28,10 +28,17 @@
 
 namespace controlit {
 
+enum EnableState {
+    DISABLED = 0,
+    SENSING = 1,
+    ENABLED = 2
+};
+
 /*!
- * This is the super-class of all plan elements, which include controlit::Task
- * and controlit::Constraint.  It defines the "isEnabled" parameter that is used
- * by the controller to determine which tasks and constraints to use.
+ * This is the super-class of all WBC primitives. They include include 
+ * controlit::Task and controlit::Constraint.  It defines the 
+ * "enableState" parameter that is used by the controller to determine
+ * which tasks and constraints to include in the control law.
  */
 class PlanElement : public ParameterReflection
 {
@@ -46,12 +53,20 @@ protected:
     explicit PlanElement(std::string const& typeName, std::string const& instanceName);
 
 public:
+
     /*!
-     * Returns whether this plan element is enabled.
+     * Returns whether this WBC primitive is enabled.
+     *
+     * \return true if enabled.
+     */
+    bool isEnabled() const; 
+
+    /*!
+     * Returns the enable state of this WBC primitive.
      *
      * \return true if this plan element is enabled.
      */
-    bool isEnabled() const;
+    int getEnableState() const;
   
     /*!
      * Generates a string representation of this class.
@@ -66,7 +81,7 @@ private:
     /*!
      * Whether this plan element is enabled. Zero means false; non-zero means true.
      */
-    int isEnabled_;
+    int enableState;
 };
 
 } // namespace controlit

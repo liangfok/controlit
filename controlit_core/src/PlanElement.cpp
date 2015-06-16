@@ -24,20 +24,41 @@ namespace controlit {
 
 PlanElement::PlanElement(std::string const& typeName, std::string const& instanceName) :
     ParameterReflection(typeName, instanceName),
-    isEnabled_(1)
+    enableState(EnableState::ENABLED)
 {
-    declareParameter("enabled", &isEnabled_);
+    declareParameter("enableState", &enableState);
 }
 
 bool PlanElement::isEnabled() const
 {
-    return isEnabled_ != 0;
+    return enableState == EnableState::ENABLED;
+}
+
+
+int PlanElement::getEnableState() const
+{
+    return enableState;
+}
+
+static std::string enableStateToString(int enableState)
+{
+	switch(enableState)
+	{
+		case DISABLED:
+			return "DISABLED";
+		case SENSING:
+			return "SENSING";
+		case ENABLED:
+			return "ENABLED";
+		default:
+			return "UNKNOWN";
+	}
 }
 
 void PlanElement::dump(std::ostream& os, std::string const& prefix) const
 {
     ParameterReflection::dump(os, prefix + "  parameters", prefix + "    ");
-    os << prefix + "isEnabled: " << isEnabled() << std::endl;
+    os << prefix + "enableState: " << enableStateToString(enableState) << std::endl;
 }
 
 } // namespace controlit

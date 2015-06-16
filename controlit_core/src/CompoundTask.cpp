@@ -318,7 +318,7 @@ size_t CompoundTask::numEnabledTasks(const std::vector<std::shared_ptr<Task>> & 
   
     for (auto& task : taskList)
     {
-        if (task->isEnabled())
+        if (task->getEnableState() == EnableState::ENABLED)
             result++;
     }
   

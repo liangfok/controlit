@@ -113,23 +113,23 @@ bool ConstraintSet::loadConfig(YAML::Node const& doc)
         for (YAML::Iterator it = activeConstraintsNode->begin(); it != activeConstraintsNode->end(); ++it)
         {
             std::string name;
-            int enabled;
+            int enableState;
 
             (*it)["name"] >> name;
-            if ((*it).FindValue("enabled"))
+            if ((*it).FindValue("enableState"))
             {
-                (*it)["enabled"] >> enabled;
+                (*it)["enableState"] >> enableState;
             }
             else
             {
-                PRINT_DEBUG_STATEMENT("No enabled specification found.  Assuming enabled = true.")
-                enabled = 1;
+                PRINT_DEBUG_STATEMENT("No enableState specification found.  Assuming enableState == EnableState::ENABLED.")
+                enableState = EnableState::ENABLED;
             }
 
             auto tuple = constraintList.find(name);
             if (tuple != constraintList.end())
             {
-                tuple->second->lookupParameter("enabled")->set(enabled);
+                tuple->second->lookupParameter("enableState")->set(enableState);
                 addConstraint(tuple->second);
             }
             else
