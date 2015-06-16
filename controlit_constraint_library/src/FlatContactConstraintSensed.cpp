@@ -29,7 +29,7 @@ namespace constraint_library {
 FlatContactConstraintSensed::FlatContactConstraintSensed() :
   ContactConstraint("controlit/FlatContactConstraintSensed", "__UNNAMED__")
 {
-    CONTROLIT_PR_INFO << "Constructor called.";
+    // CONTROLIT_PR_INFO << "Constructor called.";
   
     this->constrainedDOFs_ = 6;
   
@@ -45,7 +45,7 @@ FlatContactConstraintSensed::FlatContactConstraintSensed() :
 FlatContactConstraintSensed::FlatContactConstraintSensed(std::string const& name) :
     ContactConstraint("controlit/FlatContactConstraintSensed", name)
 {
-    CONTROLIT_PR_INFO << "Constructor called.";
+    // CONTROLIT_PR_INFO << "Constructor called.";
   
     this->constrainedDOFs_ = 6;
   
@@ -60,7 +60,7 @@ FlatContactConstraintSensed::FlatContactConstraintSensed(std::string const& name
 
 void FlatContactConstraintSensed::init(RigidBodyDynamics::Model& robot)
 {
-    CONTROLIT_PR_INFO << "Method called.";
+    // CONTROLIT_PR_INFO << "Method called.";
   
     //Set up phi_ mapping
     phi_.setIdentity(6,6);
