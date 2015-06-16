@@ -330,9 +330,12 @@ bool RobotInterfaceSM::read(controlit::RobotState & latestRobotState, bool block
             }
 
             if (!isValid)
+            {
                 CONTROLIT_ERROR_RT 
                     << "Received questionable robot state:\n" 
                     << controlit::addons::ros::jointStateMsgToString(jointStateMsg);
+                assert(false);
+            }
         }
 
         
