@@ -57,9 +57,9 @@ RobotInterfaceSM::RobotInterfaceSM() :
     rttRxSubscriber(LISTEN_TO_ROS_TOPIC, USE_POLLING),
     rcvdJointState(false),
     rcvdInitStateMsg(false),
-    rcvdInitRTTMsg(false),
-    rcvdFirstStateMsg(false),
-    rcvdFirstRTTMsg(false)
+    rcvdInitRTTMsg(false)
+    // rcvdFirstStateMsg(false)
+    // rcvdFirstRTTMsg(false)
 {
 }
 
@@ -188,11 +188,11 @@ void RobotInterfaceSM::rttCallback(std_msgs::Int64 & msg)
     }
     else
     {
-        if (!rcvdFirstRTTMsg)
-        {
-            CONTROLIT_INFO_RT << "Received first RTT message!";
-            rcvdFirstRTTMsg = true;
-        }
+        // if (!rcvdFirstRTTMsg)
+        // {
+        //     CONTROLIT_INFO_RT << "Received first RTT message!";
+        //     rcvdFirstRTTMsg = true;
+        // }
         rttRxMsgMutex.lock();
         rttRxMsg = msg;
         rttRxMsgMutex.unlock();
@@ -208,11 +208,11 @@ void RobotInterfaceSM::jointStateCallback(sensor_msgs::JointState & msg)
     }
     else
     {
-        if (!rcvdFirstStateMsg)
-        {
-            CONTROLIT_INFO_RT << "Received first state message!";
-            rcvdFirstStateMsg = true;
-        }
+        // if (!rcvdFirstStateMsg)
+        // {
+        //     CONTROLIT_INFO_RT << "Received first state message!";
+        //     rcvdFirstStateMsg = true;
+        // }
 
         jointStateMutex.lock();
 

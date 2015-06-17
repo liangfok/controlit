@@ -104,7 +104,7 @@ private:
     std::string odometryTopic;
 
     bool rcvdInitOdomMsg;
-    bool rcvdFirstOdomMsg;
+    // bool rcvdFirstOdomMsg;
 };
 
 } // namespace robot_interface_library

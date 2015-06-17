@@ -196,12 +196,12 @@ private:
     /*!
      * Whether the first valid state message was received.
      */
-    bool rcvdFirstStateMsg;
+    // bool rcvdFirstStateMsg;
 
     /*!
      * Whether the first valid RTT message was received.
      */
-    bool rcvdFirstRTTMsg;
+    // bool rcvdFirstRTTMsg;
 
 
 };

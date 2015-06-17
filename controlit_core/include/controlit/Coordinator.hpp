@@ -427,8 +427,8 @@ private:
      */
     ros::ServiceServer getControllerConfigService;
 
-    bool isFirstState;
-    bool isFirstCommand;
+    // bool isFirstState;
+    // bool isFirstCommand;
 };
 
 } // namespace controlit

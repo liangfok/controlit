@@ -78,9 +78,9 @@ Coordinator::Coordinator() :
     servoClock(nullptr),
     robotInterface(nullptr),
     compoundTask(nullptr),
-    controller(nullptr),
-    isFirstState(true),
-    isFirstCommand(true)
+    controller(nullptr)
+    // isFirstState(true),
+    // isFirstCommand(true)
 {
 }
 
@@ -377,24 +377,24 @@ void Coordinator::servoUpdate()
         // updateLatencyStat.cancelTimer();
         return;
     }
-    else
-    {
-        if (isFirstState)
-        {
-            char buffer[30];
-            struct timeval tv;
-            time_t curtime;
+    // else
+    // {
+    //     if (isFirstState)
+    //     {
+    //         char buffer[30];
+    //         struct timeval tv;
+    //         time_t curtime;
 
-            gettimeofday(&tv, NULL); 
-            curtime=tv.tv_sec;
+    //         gettimeofday(&tv, NULL); 
+    //         curtime=tv.tv_sec;
           
-            strftime(buffer,30,"%m-%d-%Y  %T.", localtime(&curtime));
+    //         strftime(buffer,30,"%m-%d-%Y  %T.", localtime(&curtime));
 
-            CONTROLIT_INFO_RT << "Receiving first state at time " << buffer << tv.tv_usec;
+    //         CONTROLIT_INFO_RT << "Receiving first state at time " << buffer << tv.tv_usec;
 
-            isFirstState = false;
-        }
-    }
+    //         isFirstState = false;
+    //     }
+    // }
 
     latencyRead = servoLatencyTimer->getTime();
 
@@ -502,20 +502,20 @@ void Coordinator::servoUpdate()
     }
     else
     {
-        if (isFirstCommand)
-        {
-            char buffer[30];
-            struct timeval tv;
-            time_t curtime;
+        // if (isFirstCommand)
+        // {
+        //     char buffer[30];
+        //     struct timeval tv;
+        //     time_t curtime;
 
-            gettimeofday(&tv, NULL); 
-            curtime=tv.tv_sec;
+        //     gettimeofday(&tv, NULL); 
+        //     curtime=tv.tv_sec;
           
-            strftime(buffer,30,"%m-%d-%Y  %T.", localtime(&curtime));
+        //     strftime(buffer,30,"%m-%d-%Y  %T.", localtime(&curtime));
 
-            CONTROLIT_INFO_RT << "Sending first command at time " << buffer << tv.tv_usec;
-            isFirstCommand = false;
-        }
+        //     CONTROLIT_INFO_RT << "Sending first command at time " << buffer << tv.tv_usec;
+        //     isFirstCommand = false;
+        // }
         
         // Write command to the robot
         robotInterface->write(command);
