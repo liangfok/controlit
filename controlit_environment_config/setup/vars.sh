@@ -7,8 +7,8 @@ export PYTHONPATH=$PYTHONPATH:`rospack find controlit_robot_interface_library`/s
 export PYTHONPATH=$PYTHONPATH:`rospack find controlit_core`/src
 
 # Build variables.
-export ROS_BUILD_TYPE=RelWithDebInfo
-# export ROS_BUILD_TYPE=Release
+# export CONTROLIT_BUILD_TYPE=RelWithDebInfo
+export CONTROLIT_BUILD_TYPE=Release
 
 #export CAPTURE_CODE_COVERAGE=On
 # unset CAPTURE_CODE_COVERAGE
