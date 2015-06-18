@@ -56,9 +56,14 @@ public:
     virtual bool init(ControlModel & model);
   
     /*!
+     * Computes the current COM.
+     */
+    virtual bool sense(ControlModel & model);
+
+    /*!
      * Computes the desired commands.
      */
-    virtual bool getCommand(ControlModel& model, TaskCommand & command);
+    virtual bool getCommand(ControlModel & model, TaskCommand & command);
 
 protected:
 
@@ -132,13 +137,16 @@ protected:
 
 private:
     Matrix JvFrame, JwFrame, Jcom, JtLoc;
-    Matrix RFrame;
-    Vector TFrame;
-    Vector VFrame;
-  
+    
     Matrix linkIndexMask;
     std::vector<unsigned int> linkIndexList;
   
+    // Variables used in the sensing method
+    Matrix RFrame;
+    Vector TFrame, VFrame;
+    Vector Q, Qd;
+    Vector comPos, comVel, actualPos, actualVel, goalPos, goalVel;
+
     /*!
      * Persistent pointers to parameters.  These pointers are maintained to prevent
      * having to constantly call lookupParameter(...).
@@ -149,7 +157,7 @@ private:
     controlit::Parameter * paramWorldProjectedCOMVel;
     controlit::Parameter * paramWorldCOM;
     controlit::Parameter * paramWorldCOMVel;
-  
+
     void addDefaultBindings();
 };
 

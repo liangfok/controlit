@@ -49,8 +49,8 @@ COMTask::COMTask() :
     paramWorldProjectedCOM = declareParameter("projectedWorldPosition", &worldProjectedCOM_);
     paramFrameProjectedCOMVel = declareParameter("projectedVelocity", &frameProjectedCOMVel_);
     paramWorldProjectedCOMVel = declareParameter("projectedWorldVelocity", &worldProjectedCOMVel_);
-    paramWorldCOM = declareParameter("worldCOM", &worldCOM_);
-    paramWorldCOMVel = declareParameter("worldCOMVel", &worldCOMVel_);
+    paramWorldCOM = declareParameter("actualWorldPosition", &worldCOM_);
+    paramWorldCOMVel = declareParameter("actualWorldVelocity", &worldCOMVel_);
 
     // Create the PD controller
     controller.reset(PDControllerFactory::create(SaturationPolicy::ComponentWiseVel));
@@ -72,9 +72,6 @@ bool COMTask::init(ControlModel & model)
     Jcom.resize(3, model.getNumDOFs());
     JtLoc.resize(3, model.getNumDOFs());
     linkIndexMask.setZero(3, model.getNumDOFs());
-    RFrame.resize(3, 3);
-    TFrame.resize(3);
-    VFrame.resize(3);
   
     // Resize output/optional parameters
     frameProjectedCOM_.resize(3);
@@ -84,45 +81,68 @@ bool COMTask::init(ControlModel & model)
     worldCOM_.resize(3);
     worldCOMVel_.resize(3);
   
-    controller->resize(3);
+    controller->resize(3, getEnableState() == EnableState::SENSING);
   
+    // Initialize variables used in the sense() method
+    RFrame.resize(3, 3);
+    TFrame.resize(3);
+    VFrame.resize(3);
+    Q.setZero(model.getNumDOFs());
+    Qd.setZero(model.getNumDOFs());
+    comPos.setZero(3);
+    comVel.setZero(3);
+    actualPos.setZero(3);
+    actualVel.setZero(3);
+    goalPos.setZero(3);
+    goalVel.setZero(3);
+
+    // Check whether the input parameters have the correct dimensions. 
+    // If the enable state is sensing, use default values.
     if (goalPosition_.rows() != 3)
     {
-        CONTROLIT_ERROR << "ERROR: COMTask::init: Goal position must have " << 3 << " dimensions, got " << goalPosition_.rows();
-        return false;
+        if (getEnableState() == EnableState::SENSING)
+            goalPosition_.setZero(3);
+        else
+        {
+            CONTROLIT_ERROR << "ERROR: COMTask::init: Goal position must have " << 3 << " dimensions, got " << goalPosition_.rows();
+            return false;
+        }
     }
   
     if (goalVelocity_.rows() != 3)
     {
-        CONTROLIT_ERROR << "ERROR: COMTask::init: Goal velocity must have " << 3 << " dimensions, got " << goalVelocity_.rows();
-        return false;
+        if (getEnableState() == EnableState::SENSING)
+            goalVelocity_.setZero(3);
+        else
+        {
+            CONTROLIT_ERROR << "ERROR: COMTask::init: Goal velocity must have " << 3 << " dimensions, got " << goalVelocity_.rows();
+            return false;
+        }
     }
   
-    if(projection_.rows() != 3 || projection_.cols() != 3)
+    if (projection_.rows() != 3 || projection_.cols() != 3)
     {
-        CONTROLIT_ERROR << "ERROR: COMTask::init: Projection matrix must have size 3 x 3, got " << projection_.rows() << " x " << projection_.cols();
-        return false;
+        if (getEnableState() == EnableState::SENSING)
+            projection_.setIdentity(3, 3);
+        else
+        {
+            CONTROLIT_ERROR << "ERROR: COMTask::init: Projection matrix must have size 3 x 3, got " << projection_.rows() << " x " << projection_.cols();
+            return false;
+        }
     }
   
     // Allocate space for other local variables
     errpos.resize(3);
     errvel.resize(3);
   
-    // Grab pointers to parameters
-    // paramFrameProjectedCOM = this->lookupParameter("projectedPosition");
-    // paramFrameProjectedCOMVel = this->lookupParameter("projectedWorldPosition");
-    // paramWorldProjectedCOM = this->lookupParameter("projectedVelocity");
-    // paramWorldProjectedCOMVel = this->lookupParameter("projectedWorldVelocity");
-    // paramWorldCOM = this->lookupParameter("worldCOM");
-    // paramWorldCOMVel = this->lookupParameter("worldCOMVel");
-    linkIndexList.clear(); //paranoid
+    linkIndexList.clear();
   
-    if(!jointNameList_.empty())
+    if (!jointNameList_.empty())
     {
-        for(unsigned int ii = 0; ii < jointNameList_.size(); ii ++)
+        for (unsigned int ii = 0; ii < jointNameList_.size(); ii++)
         {
             int id;
-            if(!model.getFrameID(jointNameList_[ii], id))
+            if (!model.getFrameID(jointNameList_[ii], id))
                 return false;
       
             //TODO : MAKE THIS MORE GENERAL--NOT NECESSARILY 6 VIRTUAL DOFs
@@ -162,8 +182,8 @@ void COMTask::addDefaultBindings()
     if (!hasBinding("projectedWorldPosition"))  addParameter(createROSOutputBinding("projectedWorldPosition", "std_msgs/Float64MultiArray"));
     if (!hasBinding("projectedVelocity"))       addParameter(createROSOutputBinding("projectedVelocity", "std_msgs/Float64MultiArray"));
     if (!hasBinding("projectedWorldVelocity"))  addParameter(createROSOutputBinding("projectedWorldVelocity", "std_msgs/Float64MultiArray"));
-    if (!hasBinding("worldCOM"))                addParameter(createROSOutputBinding("worldCOM", "std_msgs/Float64MultiArray"));
-    if (!hasBinding("worldCOMVel"))             addParameter(createROSOutputBinding("worldCOMVel", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("actualWorldPosition"))     addParameter(createROSOutputBinding("actualWorldPosition", "std_msgs/Float64MultiArray"));
+    if (!hasBinding("actualWorldVelocity"))     addParameter(createROSOutputBinding("actualWorldVelocity", "std_msgs/Float64MultiArray"));
     if (!hasBinding("PDCommand"))               addParameter(createROSOutputBinding("PDCommand", "std_msgs/Float64MultiArray"));
 }
 bool COMTask::updateStateImpl(ControlModel * model, TaskState * taskState)
@@ -222,37 +242,29 @@ bool COMTask::updateStateImpl(ControlModel * model, TaskState * taskState)
     return true;
 }
 
-// This method is inhereted from PDTask, which is the parent class
-bool COMTask::getCommand(ControlModel & model, TaskCommand & u)
+bool COMTask::sense(ControlModel & model)
 {
-    PRINT_DEBUG_STATEMENT_RT("Method called!")
-  
     // Get the latest joint state information
-    Vector Q(model.getNumDOFs());
-    Vector Qd(model.getNumDOFs());
-  
     model.getLatestFullState(Q, Qd);
-  
+
     //Check if latched status has been updated
     updateLatch(&model);
-  
+
     //Set local variable to be modified--this will end up as WORLD frame goals
-    Vector goalPos = goalPosition_;
-    Vector goalVel = goalVelocity_;
-  
+    goalPos = goalPosition_;
+    goalVel = goalVelocity_;
+
     // Compute the position and velocity of the COM
-    Vector comPos = RigidBodyDynamics::Extras::calcRobotCOM(model.rbdlModel(), Q, linkIndexList);
-    Vector comVel = RigidBodyDynamics::Extras::calcRobotCOMVel(model.rbdlModel(), Q, Qd, linkIndexList);
-  
+    comPos = RigidBodyDynamics::Extras::calcRobotCOM(model.rbdlModel(), Q, linkIndexList);
+    comVel = RigidBodyDynamics::Extras::calcRobotCOMVel(model.rbdlModel(), Q, Qd, linkIndexList);
+
     // Publish parameters "worldCOM" and "worldCOMVel"
     paramWorldCOM->set(comPos);
     paramWorldCOMVel->set(comVel);
-  
+
     if(frameId_ != -1)  // Using a robot frame--possibly latched
     {
-        Vector actualPos(3);
-        Vector actualVel(3);
-        if(isLatched)  //latched, don't care about relative motion, just offset
+        if(isLatched)  // latched, don't care about relative motion, just offset
         {
             RFrame = latchedRotation;
             TFrame = latchedTranslation;
@@ -279,35 +291,44 @@ bool COMTask::getCommand(ControlModel & model, TaskCommand & u)
             goalPos = RFrame.transpose() * projection_ * goalPosition_ + TFrame;
             goalVel = RFrame.transpose() * projection_ * goalVelocity_ + VFrame;
         }
-    
+
         paramFrameProjectedCOM->set(actualPos); // sets local variable 'actualPosition'
         paramFrameProjectedCOMVel->set(actualVel);
     }
     else // Using fixed world reference frame--latching immaterial
     {
-        comPos = projection_ * comPos;
+        comPos  = projection_ * comPos;
         goalPos = projection_ * goalPosition_;
-    
-        comVel = projection_ * comVel;
+        comVel  = projection_ * comVel;
         goalVel = projection_ * goalVelocity_;
-    
+
         // publish parameter "actualPosition"
         paramFrameProjectedCOM->set(comPos);
         paramFrameProjectedCOMVel->set(comVel);
     }
-  
+
     paramWorldProjectedCOM->set(comPos);
     paramWorldProjectedCOMVel->set(comVel);
+
+    return true;
+}
+
+// This method is inhereted from PDTask, which is the parent class
+bool COMTask::getCommand(ControlModel & model, TaskCommand & u)
+{
+    PRINT_DEBUG_STATEMENT_RT("Method called!")
   
-    getJacobian(JtLoc);
+    if (!sense(model)) return false;
+    
+    // getJacobian(JtLoc);
     errpos = goalPos - comPos;
     errvel = goalVel - comVel; //-JtLoc * model.getQd();
-  
+
     // Set the command type
     u.type = commandType_;
   
     controller->computeCommand(errpos, errvel, u.command, this);
-  
+
     return true;
 }
 
