@@ -43,19 +43,24 @@ public:
      * The default constructor.
      */
     OrientQuaternionTask();
-  
+
     /*!
      * Initializes this task.
      *
      * \param[in] model The control model used to execute this task.
      */
     virtual bool init(ControlModel & model);
-  
+
+    /*!
+     * Computes the current orientation.
+     */
+    virtual bool sense(ControlModel & model);
+
     /*!
     * Computes the desired commands.
     */
     virtual bool getCommand(ControlModel& model, TaskCommand & command);
-  
+
 protected:
 
     /*!
@@ -68,9 +73,9 @@ protected:
      * \return Whether the update state operation was successful.
      */
     virtual bool updateStateImpl(ControlModel * model, TaskState * taskState);
-  
+
     /*!
-     * 
+     *
      */
     std::string bodyName_;
 
@@ -78,50 +83,50 @@ protected:
      *
      */
     unsigned int bodyId_;
-  
+
     /*!
      * Goal quaternion in the frameName_ frame
      */
     Vector goalPosition_;
-  
+
     /*!
      * Controled quaternion in the bodyName_ frame
      */
     Vector controlPoint_;
-  
+
     /*!
      * Goal angular velocity in the frameName_ frame
      */
     Vector goalVelocity_;
-  
+
     /*!
      * Actual (control point) quaternion in the frameName_ frame
      */
     Vector actualPosition_;
-  
+
     /*!
      * Actual quaternion in the world frame
      */
     Vector actualWorldPosition_;
-  
+
     /*!
      * Error quaternion
      */
     Vector errorQuat_;
-  
+
     /*!
      * A PD controller
      */
     std::unique_ptr<PDController> controller;
-  
+
 private:
     void addDefaultBindings();
-  
+
     Eigen::Quaternion<double> goalQuat, cpQuat, frameQuat, bodyQuat, curQuat, curInFrameQuat, desQuat, errQuat;
     Eigen::Quaternion<double>::Matrix3 goalRot, cpRot, frameRot, bodyRot, curRot, curInFrameRot, desRot;
     Matrix JwBody, JwFrame, JtLoc, Je1, Je2, Je3;
     Vector e0, e0dot;
-  
+
     /*!
      * Persistent pointers to parameters.  These pointers are maintained to prevent
      * having to call lookupParameter(...) every time getCommand(...) is called.
@@ -135,7 +140,7 @@ private:
      */
     controlit::addons::ros::RealtimePublisher<visualization_msgs::MarkerArray>
         visualizationPublisher;
-  
+
     /*!
      * The topic on which to publish the marker array messages for visualizing the
      * goal and current quaternions.
@@ -153,6 +158,9 @@ private:
     // visualization_msgs::Marker currMarker;
     Vector base_vector;
     Vector bodyToBaseTrans;
+
+    Vector Q, Qd;
+    Vector actualPositionTemp, actualWorldPositionTemp, errorQuatTemp;
 
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
