@@ -87,14 +87,19 @@ struct PDController : public interface::PDController
         pr->declareParameter("dt", & dt);
     }
   
-    virtual bool resize(int dimension)
+    virtual bool resize(int dimension, bool initDefault)
     {
         PRINT_DEBUG_STATEMENT("Method Called!")
     
         if (kp.size() != dimension)
         {
-            CONTROLIT_ERROR << "Size of kp incorrect.  Expected " << dimension << ", got " << kp.size();
-            return false;
+            if (initDefault)
+                kp.setZero(dimension);
+            else
+            {
+                CONTROLIT_ERROR << "Size of kp incorrect.  Expected " << dimension << ", got " << kp.size();
+                return false;
+            }
         }
     
         if (ki.size() == 0)
@@ -106,15 +111,25 @@ struct PDController : public interface::PDController
         {
             if (ki.size() != dimension)
             {
-                CONTROLIT_ERROR << "Size of ki incorrect.  Expected " << dimension << ", got " << ki.size();
-                return false;
+                if (initDefault)
+                    ki.setZero(dimension);
+                else
+                {
+                    CONTROLIT_ERROR << "Size of ki incorrect.  Expected " << dimension << ", got " << ki.size();
+                    return false;
+                }
             }
         }
     
         if (kd.size() != dimension)
         {
-            CONTROLIT_ERROR << "Size of kd incorrect.  Expected " << dimension << ", got " << kd.size();
-            return false;
+            if (initDefault)
+                kd.setZero(dimension);
+            else
+            {
+                CONTROLIT_ERROR << "Size of kd incorrect.  Expected " << dimension << ", got " << kd.size();
+                return false;
+            }
         }
     
         e.resize(dimension);
@@ -126,7 +141,7 @@ struct PDController : public interface::PDController
               << ", got " << maxVelocity.size()
               << ".  Setting maxVelocity to be a 1-vector of size " << dimension << ".";
     
-          maxVelocity.setOnes(dimension);
+            maxVelocity.setOnes(dimension);
         }
     
         if (maxAcceleration.size() != dimension)
@@ -256,171 +271,186 @@ private:
 template<>
 struct PDControllerTraits<interface::SaturationPolicy::ComponentWiseVel>
 {
-  typedef Vector  Gain;
-  typedef Vector  Parameter;
+    typedef Vector  Gain;
+    typedef Vector  Parameter;
 };
 
 template<>
-bool PDController<interface::SaturationPolicy::ComponentWiseVel>::resize(int dimension)
+bool PDController<interface::SaturationPolicy::ComponentWiseVel>::resize(int dimension, bool initDefault)
 {
-  // PRINT_DEBUG_STATEMENT("Method Called!");
+    // PRINT_DEBUG_STATEMENT("Method Called!");
 
-  if (kp.size() != dimension)
-  {
-    CONTROLIT_ERROR << "Size of kp incorrect.  Expected " << dimension << ", got " << kp.size();
-    return false;
-  }
-
-  if (ki.size() == 0)
-  {
-    CONTROLIT_WARN << "Ki not specified.  Using a zero vector of size " << dimension << ".";
-    ki.setZero(dimension);
-  }
-  else
-  {
-    if (ki.size() != dimension)
+    if (kp.size() != dimension)
     {
-      CONTROLIT_ERROR << "Size of ki incorrect.  Expected " << dimension << ", got " << ki.size();
-      return false;
+        if (initDefault)
+            kp.setZero(dimension);
+        else
+        {
+            CONTROLIT_ERROR << "Size of kp incorrect.  Expected " << dimension << ", got " << kp.size();
+            return false;
+        }
     }
-  }
 
-  if (kd.size() != dimension)
-  {
-    CONTROLIT_ERROR << "Size of kd incorrect.  Expected " << dimension << ", got " << kd.size();
-    return false;
-  }
+    if (ki.size() == 0)
+    {
+        CONTROLIT_WARN << "Ki not specified.  Using a zero vector of size " << dimension << ".";
+        ki.setZero(dimension);
+    }
+    else
+    {
+        if (ki.size() != dimension)
+        {
+            if (initDefault)
+                ki.setZero(dimension);
+            else
+            {
+                CONTROLIT_ERROR << "Size of ki incorrect.  Expected " << dimension << ", got " << ki.size();
+                return false;
+            }
+        }
+    }
 
-  e.resize(dimension);
-  e_dot.resize(dimension);
-
-  if (maxVelocity.size() != dimension)
-  {
-    CONTROLIT_WARN << "Size of maxVelocity incorrect.  Expected " << dimension
-      << ", got " << maxVelocity.size()
-      << ".  Setting maxVelocity to be a 1-vector of size " << dimension << ".";
-
-    maxVelocity.setOnes(dimension);
-  }
-
-  if (maxAcceleration.size() != dimension)
-  {
-    CONTROLIT_WARN << "Size of maxAcceleration incorrect.  Expected " << dimension
-      << ", got " << maxAcceleration.size()
-      << ".  Setting maxAcceleration to be a zero-vector of size " << dimension << ".";
-
-    maxAcceleration.setZero(dimension);
-  }
-
-  PDCommand.resize(dimension);
-  integralSaturation.resize(dimension);
-
-  integralTerm.setZero(dimension);
-  lastIntegralTerm.setZero(dimension);
-  untilityZero.setZero(dimension);
-
-  int Nterms = static_cast<int>(integralPeriod / dt);
-  for(int i = 0; i < Nterms; i++)
-    lastNIntegralTerms.push_back(untilityZero);
-
-  return true;
+    if (kd.size() != dimension)
+    {
+        if (initDefault)
+            kd.setZero(dimension);
+        else
+        {
+            CONTROLIT_ERROR << "Size of kd incorrect.  Expected " << dimension << ", got " << kd.size();
+            return false;
+        }
+    }
+  
+    e.resize(dimension);
+    e_dot.resize(dimension);
+  
+    if (maxVelocity.size() != dimension)
+    {
+        CONTROLIT_WARN << "Size of maxVelocity incorrect.  Expected " << dimension
+                       << ", got " << maxVelocity.size()
+                       << ".  Setting maxVelocity to be a 1-vector of size " << dimension << ".";
+    
+        maxVelocity.setOnes(dimension);
+    }
+  
+    if (maxAcceleration.size() != dimension)
+    {
+        CONTROLIT_WARN << "Size of maxAcceleration incorrect.  Expected " << dimension
+                       << ", got " << maxAcceleration.size()
+                       << ".  Setting maxAcceleration to be a zero-vector of size " << dimension << ".";
+    
+        maxAcceleration.setZero(dimension);
+    }
+  
+    PDCommand.resize(dimension);
+    integralSaturation.resize(dimension);
+  
+    integralTerm.setZero(dimension);
+    lastIntegralTerm.setZero(dimension);
+    untilityZero.setZero(dimension);
+  
+    int Nterms = static_cast<int>(integralPeriod / dt);
+    for(int i = 0; i < Nterms; i++)
+        lastNIntegralTerms.push_back(untilityZero);
+  
+    return true;
 }
 
 template<>
 bool PDController<interface::SaturationPolicy::ComponentWiseVel>::computeCommandPolicy(Vector& u)
 {
-  PRINT_DEBUG_STATEMENT_NOPOLICY("(ComponentWiseVel): Method Called!\n"
-    << " - integralOn = " << integralOn << "\n"
-    << " - kp = " << kp.transpose() << "\n"
-    << " - ki = " << ki.transpose() << "\n"
-    << " - kd = " << kd.transpose() << "\n"
-    << " - e = " << e.transpose() << "\n"
-    << " - eDot = " << e_dot.transpose())
+    PRINT_DEBUG_STATEMENT_NOPOLICY("(ComponentWiseVel): Method Called!\n"
+        << " - integralOn = " << integralOn << "\n"
+        << " - kp = " << kp.transpose() << "\n"
+        << " - ki = " << ki.transpose() << "\n"
+        << " - kd = " << kd.transpose() << "\n"
+        << " - e = " << e.transpose() << "\n"
+        << " - eDot = " << e_dot.transpose())
 
-  assert(kp.size() == e.size());
-  u = (kp.array() * e.array()).matrix();
-
-  PRINT_DEBUG_STATEMENT_NOPOLICY("(ComponentWiseVel): Before velocity saturation:\n"
-    << " - u = " << u.transpose() << "\n"
-    << " - maxVelocity = " << maxVelocity.transpose())
-
-  // PRINT_DEBUG_STATEMENT("u prior to saturation: = " << u.transpose());
-
-  for (int row = 0; row < u.rows(); ++row)
-  {
-    if (std::abs(maxVelocity[row]) > 1e-6 && std::abs(kd[row]) > 1e-6 )   // beware of div by zero
+    assert(kp.size() == e.size());
+    u = (kp.array() * e.array()).matrix();
+  
+    PRINT_DEBUG_STATEMENT_NOPOLICY("(ComponentWiseVel): Before velocity saturation:\n"
+        << " - u = " << u.transpose() << "\n"
+        << " - maxVelocity = " << maxVelocity.transpose())
+  
+    // PRINT_DEBUG_STATEMENT("u prior to saturation: = " << u.transpose());
+  
+    for (int row = 0; row < u.rows(); ++row)
     {
-      double sat = std::fabs( u[row] / (maxVelocity[row] * kd[row]) );
-      if (sat > 1.0) u[row] /= sat;
+        if (std::abs(maxVelocity[row]) > 1e-6 && std::abs(kd[row]) > 1e-6 )   // beware of div by zero
+        {
+            double sat = std::fabs( u[row] / (maxVelocity[row] * kd[row]) );
+            if (sat > 1.0) u[row] /= sat;
+        }
     }
-  }
-
-  PRINT_DEBUG_STATEMENT_NOPOLICY("(ComponentWiseVel): After velocity saturation:\n"
-    << " - u = " << u.transpose())
-
-  // PRINT_DEBUG_STATEMENT("u after saturation: = " << u.transpose());
-
-  assert(kd.size() == e_dot.size());
-
-  u += (kd.array() * e_dot.array()).matrix();
-
-  PRINT_DEBUG_STATEMENT_NOPOLICY("(ComponentWiseVel): After adding damping:\n"
-    << " - u = " << u.transpose())
-
-  if (!controlit::addons::eigen::checkMagnitude(u))
-  {
-    CONTROLIT_ERROR << "(ComponentWiseVel): Command contains invalid values after adding damping:\n"
-      << "  - u = " << u.transpose() << "\n"
-      << " - integralOn = " << integralOn << "\n"
-      << " - kp = " << kp.transpose() << "\n"
-      << " - ki = " << ki.transpose() << "\n"
-      << " - kd = " << kd.transpose() << "\n"
-      << " - e = " << e.transpose() << "\n"
-      << " - eDot = " << e_dot.transpose();
-    return false;
-  }
-
-  if(integralOn)
-  {
-    assert(ki.size() == e.size());
-
-    integralTerm = dt * (ki.array() * e.array()).matrix();
-    lastNIntegralTerms.push_back(integralTerm);
-
-    integralTerm = lastIntegralTerm + lastNIntegralTerms.back();
-    integralTerm -= lastNIntegralTerms.front(); //zeros until wound up!
-
-    windUpCount += 1;
-    if(windUpCount > lastNIntegralTerms.size())
-      windUpCount = lastNIntegralTerms.size();
-
-    Vector modifiedIntegralTerm = integralTerm;//  * e.norm(); // A hack to make the Ki proportional to the error
-
-    // for(int i = 0; i < modifiedIntegralTerm.size(); i++)
-    //   if(fabs(modifiedIntegralTerm(i)) > integralSaturation(i))
-    //     modifiedIntegralTerm(i) = integralSaturation(i) * modifiedIntegralTerm(i) / fabs(modifiedIntegralTerm(i));
-
-    paramIntegralTerm->set(modifiedIntegralTerm);
-    u += integralTerm;
-
-    lastNIntegralTerms.pop_front();
-    lastIntegralTerm = integralTerm;
-  }
-  // else
-  // {
-  //   lastNIntegralTerms.push_back(untilityZero);
-  //   if(windUpCount > 0)
-  //   {
-  //     integralTerm  = lastIntegralTerm - lastNIntegralTerms.front();
-  //     windUpCount -= 1;
-  //   }
-  // }
-
-  // PRINT_DEBUG_STATEMENT("Done computing command.\n"
-  //      " - integralTerm = " << integralTerm.transpose() << "\n"
-  //      " - u = " << u.transpose());
-
-  return true;
+  
+    PRINT_DEBUG_STATEMENT_NOPOLICY("(ComponentWiseVel): After velocity saturation:\n"
+        << " - u = " << u.transpose())
+  
+    // PRINT_DEBUG_STATEMENT("u after saturation: = " << u.transpose());
+  
+    assert(kd.size() == e_dot.size());
+  
+    u += (kd.array() * e_dot.array()).matrix();
+  
+    PRINT_DEBUG_STATEMENT_NOPOLICY("(ComponentWiseVel): After adding damping:\n"
+        << " - u = " << u.transpose())
+  
+    if (!controlit::addons::eigen::checkMagnitude(u))
+    {
+        CONTROLIT_ERROR << "(ComponentWiseVel): Command contains invalid values after adding damping:\n"
+            << "  - u = " << u.transpose() << "\n"
+            << " - integralOn = " << integralOn << "\n"
+            << " - kp = " << kp.transpose() << "\n"
+            << " - ki = " << ki.transpose() << "\n"
+            << " - kd = " << kd.transpose() << "\n"
+            << " - e = " << e.transpose() << "\n"
+            << " - eDot = " << e_dot.transpose();
+        return false;
+    }
+  
+    if(integralOn)
+    {
+        assert(ki.size() == e.size());
+    
+        integralTerm = dt * (ki.array() * e.array()).matrix();
+        lastNIntegralTerms.push_back(integralTerm);
+    
+        integralTerm = lastIntegralTerm + lastNIntegralTerms.back();
+        integralTerm -= lastNIntegralTerms.front(); //zeros until wound up!
+    
+        windUpCount += 1;
+        if(windUpCount > lastNIntegralTerms.size())
+            windUpCount = lastNIntegralTerms.size();
+    
+        Vector modifiedIntegralTerm = integralTerm;//  * e.norm(); // A hack to make the Ki proportional to the error
+    
+        // for(int i = 0; i < modifiedIntegralTerm.size(); i++)
+        //   if(fabs(modifiedIntegralTerm(i)) > integralSaturation(i))
+        //     modifiedIntegralTerm(i) = integralSaturation(i) * modifiedIntegralTerm(i) / fabs(modifiedIntegralTerm(i));
+    
+        paramIntegralTerm->set(modifiedIntegralTerm);
+        u += integralTerm;
+    
+        lastNIntegralTerms.pop_front();
+        lastIntegralTerm = integralTerm;
+    }
+    // else
+    // {
+    //   lastNIntegralTerms.push_back(untilityZero);
+    //   if(windUpCount > 0)
+    //   {
+    //     integralTerm  = lastIntegralTerm - lastNIntegralTerms.front();
+    //     windUpCount -= 1;
+    //   }
+    // }
+  
+    // PRINT_DEBUG_STATEMENT("Done computing command.\n"
+    //      " - integralTerm = " << integralTerm.transpose() << "\n"
+    //      " - u = " << u.transpose());
+  
+    return true;
 }
 
 /*****************************************************************************
@@ -476,7 +506,7 @@ struct PDControllerTraits<interface::SaturationPolicy::NormVel>
 };
 
 template<>
-bool PDController<interface::SaturationPolicy::NormVel>::resize(int dimension)
+bool PDController<interface::SaturationPolicy::NormVel>::resize(int dimension, bool initDefault)
 {
   e.resize(dimension);
   e_dot.resize(dimension);

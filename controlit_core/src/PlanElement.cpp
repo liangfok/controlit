@@ -29,17 +29,6 @@ PlanElement::PlanElement(std::string const& typeName, std::string const& instanc
     declareParameter("enableState", &enableState);
 }
 
-bool PlanElement::isEnabled() const
-{
-    return enableState == EnableState::ENABLED;
-}
-
-
-int PlanElement::getEnableState() const
-{
-    return enableState;
-}
-
 static std::string enableStateToString(int enableState)
 {
 	switch(enableState)
@@ -53,6 +42,11 @@ static std::string enableStateToString(int enableState)
 		default:
 			return "UNKNOWN";
 	}
+}
+
+std::string PlanElement::getEnableStateString() const
+{
+    return enableStateToString(enableState);
 }
 
 void PlanElement::dump(std::ostream& os, std::string const& prefix) const

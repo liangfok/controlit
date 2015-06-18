@@ -50,10 +50,10 @@ CartesianPositionTask::CartesianPositionTask() :
     declareParameter("bodyName", &bodyName_);
     declareParameter("controlPoint", &controlPoint_);
     declareParameter("projection", &projection_);
-  
+
     // Create the PD controller
     controller.reset(PDControllerFactory::create(SaturationPolicy::NormVel));
-  
+
     // Add controller parameters to this task
     controller->declareParameters(this);
 }
@@ -70,7 +70,7 @@ void CartesianPositionTask::addDefaultBindings()
     if (!hasBinding("bodyName"))     addParameter(createROSInputBinding("bodyName", "std_msgs/String"));
     if (!hasBinding("controlPoint")) addParameter(createROSInputBinding("controlPoint", "std_msgs/Float64MultiArray"));
     if (!hasBinding("projection"))   addParameter(createROSInputBinding("projection", "std_msgs/Float64MultiArray"));
-    
+
     if (!hasBinding("error"))               addParameter(createROSOutputBinding("error", "std_msgs/Float64MultiArray"));
     if (!hasBinding("errorDot"))            addParameter(createROSOutputBinding("errorDot", "std_msgs/Float64MultiArray"));
     if (!hasBinding("errorNorm"))           addParameter(createROSOutputBinding("errorNorm", "std_msgs/Float64"));
@@ -95,15 +95,15 @@ bool CartesianPositionTask::init(ControlModel & model)
     CONTROLIT_INFO << buff.str();
 
     addDefaultBindings();
-    
+
     // Initialize parent class (frameId lookup)
 
     // Abort if parent class fails to initialize
     if (!LatchedTask::init(model)) return false;
-  
+
     // Get the body ID using its name
     if (!model.getBodyID(bodyName_, bodyId_)) return false;
-  
+
     // Resize the controller... really hate these magic numbers.
     // Tasks should have a strong sense of space and space should know
     // its dimension.
@@ -117,74 +117,97 @@ bool CartesianPositionTask::init(ControlModel & model)
     actualWorldPosition_.resize(3);
     actualVelocity_.resize(3);
     actualWorldVelocity_.resize(3);
-  
+
     xCurWorld.resize(3);
     xCurFrameProjected.resize(3);
     xCurWorldProjected.resize(3);
-  
+
     xDesWorldProjected.resize(3);
-  
+
+    Q.setZero(model.getNumDOFs());
+    Qd.setZero(model.getNumDOFs());
+
     // CONTROLIT_PR_INFO << "bodyId_ = " << bodyId_ << ", frameId_ = " << frameId_;
-  
+
     // Ensure the dimensions of various parameters are correct.
     if(projection_.rows() != 3 || projection_.cols() != 3)
     {
-        CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Projection matrix must have "
+        if (getEnableState() == EnableState::SENSING)
+            projection_.setIdentity(3, 3);
+        else
+        {
+            CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Projection matrix must have "
                "size 3 x 3, got "<< projection_.rows() <<" x "<<projection_.cols();
-        return false;
+            return false;
+        }
     }
-  
+
     if (controlPoint_.rows() != 3)
     {
-        CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Control point must have "
-               "3 dimensions, got " << controlPoint_.rows();
-        return false;
+        if (getEnableState() == EnableState::SENSING)
+            controlPoint_.setZero(3);
+        else
+        {
+            CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Control point must have "
+                   "3 dimensions, got " << controlPoint_.rows();
+            return false;
+        }
     }
-  
+
     if (goalPosition_.rows() != 3)
     {
-        CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Goal position must have "
-               "3 dimensions, got " << goalPosition_.rows();
-        return false;
+        if (getEnableState() == EnableState::SENSING)
+            goalPosition_.setZero(3);
+        else
+        {
+            CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Goal position must have "
+                   "3 dimensions, got " << goalPosition_.rows();
+            return false;
+        }
     }
-  
+
     if (goalVelocity_.rows() != 3)
     {
-        CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Goal Velocity must have "
-               "3 dimensions, got " << goalVelocity_.rows();
-        return false;
+        if (getEnableState() == EnableState::SENSING)
+            goalVelocity_.setZero(3);
+        else
+        {
+            CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Goal Velocity must have "
+                   "3 dimensions, got " << goalVelocity_.rows();
+            return false;
+        }
     }
-  
+
     return Task::init(model);
 }
 
 bool CartesianPositionTask::updateStateImpl(ControlModel * model, TaskState * taskState)
 {
     PRINT_DEBUG_STATEMENT("Method called!")
-  
+
     assert(model != nullptr);
     assert(taskState != nullptr);
-  
+
     Matrix & taskJacobian = taskState->getJacobian();
-  
+
     // Get the number of DOFs (both real and virtual)
     int numDOFs = model->getNumDOFs();
-  
+
     if (taskJacobian.rows() != 3 || taskJacobian.cols() != numDOFs)
     {
         PRINT_DEBUG_STATEMENT("Resizing task Jacobian to be 3x" << numDOFs)
         taskJacobian.resize(3, numDOFs);
     }
-  
+
     //Check if latched status has been updated
     updateLatch(model);
-  
+
     // Compute the Jacobian matrix that converts from a point on the body of a robot to the joint space
     RigidBodyDynamics::CalcPointJacobian(model->rbdlModel(), model->getQ(), bodyId_, Vector::Zero(3), JvBody, false);
     RigidBodyDynamics::CalcPointJacobianW(model->rbdlModel(), model->getQ(), bodyId_, Vector::Zero(3), JwBody, false);
     Vector3d bodyTranslation = RigidBodyDynamics::CalcBodyToBaseCoordinates(model->rbdlModel(), model->getQ(), bodyId_, Vector::Zero(3), false);
     Matrix3d bodyRotation =  RigidBodyDynamics::CalcBodyWorldOrientation(model->rbdlModel(), model->getQ(), bodyId_, false);
-  
+
     // The goal is specified relative to the fixed world frame
     if(frameId_ == -1)
     {
@@ -194,7 +217,7 @@ bool CartesianPositionTask::updateStateImpl(ControlModel * model, TaskState * ta
     {
         Matrix3d frameRotation;
         Vector3d frameTranslation;
-    
+
         if(isLatched)
         {
             frameRotation = latchedRotation;
@@ -205,10 +228,10 @@ bool CartesianPositionTask::updateStateImpl(ControlModel * model, TaskState * ta
         {
             frameRotation =  RigidBodyDynamics::CalcBodyWorldOrientation(model->rbdlModel(), model->getQ(), frameId_, false);
             frameTranslation = RigidBodyDynamics::CalcBodyToBaseCoordinates(model->rbdlModel(), model->getQ(), frameId_, Vector::Zero(3), false);
-      
+
             RigidBodyDynamics::CalcPointJacobian(model->rbdlModel(), model->getQ(), frameId_, Vector::Zero(3), JvFrame, false);
             RigidBodyDynamics::CalcPointJacobianW(model->rbdlModel(), model->getQ(), frameId_, Vector::Zero(3), JwFrame, false);
-      
+
             taskJacobian = frameRotation.transpose() * projection_ * frameRotation * (-RigidBodyDynamics::Math::VectorCrossMatrix(bodyRotation.transpose() * controlPoint_) * JwBody + JvBody - JvFrame);
             Vector3d beta = bodyRotation.transpose() * controlPoint_ + bodyTranslation - frameTranslation;
             Vector3d alpha = frameRotation.transpose() * projection_ * frameRotation * beta;
@@ -221,32 +244,18 @@ bool CartesianPositionTask::updateStateImpl(ControlModel * model, TaskState * ta
     return true;
 }
 
-bool CartesianPositionTask::getCommand(ControlModel& model, TaskCommand & command)
+bool CartesianPositionTask::sense(ControlModel & model)
 {
-    PRINT_DEBUG_STATEMENT_RT("Method called!")
-
-    if (tare)
-    {
-        CONTROLIT_INFO_RT << "Taring the goal position!";
-        goalPosition_ = RigidBodyDynamics::CalcBodyToBaseCoordinates(model.rbdlModel(), model.getQ(), 
-            bodyId_, controlPoint_, true);
-        tare = 0;
-    }
-  
     // Get the latest joint state information
-    Vector Q(model.getNumDOFs());
-    Vector Qd(model.getNumDOFs());
-  
     model.getLatestFullState(Q, Qd);
-  
-    Vector3d bodyTranslation = RigidBodyDynamics::CalcBodyToBaseCoordinates(model.rbdlModel(), Q, bodyId_, Vector::Zero(3), false);
-    Matrix3d bodyRotation =  RigidBodyDynamics::CalcBodyWorldOrientation(model.rbdlModel(), Q, bodyId_, false);
-  
+
+    bodyTranslation = RigidBodyDynamics::CalcBodyToBaseCoordinates(model.rbdlModel(), Q, bodyId_, Vector::Zero(3), false);
+    bodyRotation =  RigidBodyDynamics::CalcBodyWorldOrientation(model.rbdlModel(), Q, bodyId_, false);
+
     getJacobian(JtLoc);
-  
+
     xCurWorld = bodyRotation.transpose() * controlPoint_ + bodyTranslation;
-    Matrix3d frameRotation;
-    Vector3d frameTranslation;
+
 
     if(frameId_ == -1) //Using fixed world frame as reference, latching immaterial.
     {
@@ -261,7 +270,7 @@ bool CartesianPositionTask::getCommand(ControlModel& model, TaskCommand & comman
 
         xCurFrameProjected = projection_ * xCurWorld;
         xCurWorldProjected = xCurFrameProjected;
-    
+
         xDesWorldProjected = projection_ * goalPosition_;
         frameRotation.setIdentity();
     }
@@ -277,7 +286,7 @@ bool CartesianPositionTask::getCommand(ControlModel& model, TaskCommand & comman
             frameRotation = latchedRotation;
             frameTranslation = latchedTranslation;
         }
-    
+
         xCurFrameProjected = projection_ * frameRotation * (xCurWorld - frameTranslation);
         xCurWorldProjected = frameRotation.transpose() * xCurFrameProjected + frameTranslation;
         xDesWorldProjected = frameRotation.transpose() * projection_ * goalPosition_ + frameTranslation;
@@ -285,30 +294,46 @@ bool CartesianPositionTask::getCommand(ControlModel& model, TaskCommand & comman
     // publish parameter "actualPosition"
     paramActualPosition->set(xCurFrameProjected);
     paramActualWorldPosition->set(xCurWorldProjected);
-  
+
     // std::cout<<"Virtual DOFs in CartesianPositionTask : " << Q.head(6).transpose()<<std::endl;
-    Vector3d ePos = xDesWorldProjected - xCurWorldProjected;
+    ePos = xDesWorldProjected - xCurWorldProjected;
     //Debugging--only difference between compwise SMC controller and this is
     // the error_dot calculation...have now switch back -JtLoc * Qd to
     // see if it works since we're still having strange behevior w/ velocity
     // update fixed.
-    Vector3d eVel = -JtLoc * Qd;
-  
+    eVel = -JtLoc * Qd;
+
     if(goalVelocity_.norm() > 0)
     {
         eVel += frameRotation.transpose() * projection_ * goalVelocity_;
     }
-  
+
+    return true;
+}
+
+bool CartesianPositionTask::getCommand(ControlModel & model, TaskCommand & command)
+{
+    PRINT_DEBUG_STATEMENT_RT("Method called!")
+
+    if (tare)
+    {
+        CONTROLIT_INFO_RT << "Taring the goal position!";
+        goalPosition_ = RigidBodyDynamics::CalcBodyToBaseCoordinates(model.rbdlModel(), model.getQ(),
+            bodyId_, controlPoint_, true);
+        tare = 0;
+    }
+
+    if (!sense(model)) return false;
+
     // Set the command type
     command.type = commandType_;
-  
+
     // Compute the command
     controller->computeCommand(ePos,  eVel, command.command, this);
     // controller->computeCommand(ePos,  -JtLoc * Qd, command.command, this);
-  
+
     PRINT_DEBUG_STATEMENT_RT("Done method call.\n"
-                             " - command = " << command.command.transpose())
-  
+                             " - command = " << command.command.transpose());
     return true;
 }
 

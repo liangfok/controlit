@@ -523,13 +523,10 @@ void ConstraintSet::dump(std::ostream& os, std::string const& prefix) const
     for(auto & constraint : constraintSet_) // For each constraint
     {
         os << prefix << "    Constraint: "
-          << "Type: " << constraint->getTypeName()
-          << ", InstanceName: " << constraint->getInstanceName();
-    
-        if (constraint->isEnabled())
-            os << ", Status: ENABLED" << std::endl;
-        else
-            os << ", Status: DISABLED" << std::endl;
+           << "Type: " << constraint->getTypeName()
+           << ", InstanceName: " << constraint->getInstanceName()
+           << ", EnableState: " << constraint->getEnableStateString()
+           << std::endl;
     }
 }
 

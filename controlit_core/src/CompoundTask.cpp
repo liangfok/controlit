@@ -330,8 +330,7 @@ size_t CompoundTask::numEnabledTasks(const std::vector<std::shared_ptr<Task>> & 
 
 bool CompoundTask::addTasksToUpdater(TaskUpdater * taskUpdater)
 {
-    // Go through each list of lists of tasks and add the tasks to the
-    // task updater.
+    // Add every task to the task updater.
     for(auto& taskList : taskTable)
     {
         for (auto& task : taskList)
@@ -558,12 +557,10 @@ void CompoundTask::dump(std::ostream& os, std::string const& prefix) const
         // Go through each task in the taskList and print its status
         for (auto& task : taskList)
         {    
-            os << prefix << "      Task: Type: " << task->getTypeName() << ", InstanceName: " << task->getInstanceName();
-      
-            if (task->isEnabled())
-                os << ", Status: ENABLED" << std::endl;
-            else
-                os << ", Status: DISABLED" << std::endl;
+            os << prefix << "      Task: Type: " << task->getTypeName() 
+               << ", InstanceName: " << task->getInstanceName() 
+               << ", EnableState: " << task->getEnableStateString()
+               << std::endl;
         }
     }
 }

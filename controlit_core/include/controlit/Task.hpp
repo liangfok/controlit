@@ -119,6 +119,12 @@ public:
      * variable because it may not be the active one.
      */
     bool updateState(ControlModel * model);
+
+    /*!
+     * Computes the control points. This is used for model-based sensing.
+     * It can be overriden by child classes.
+     */
+    virtual bool sense(ControlModel & model) { return true; }
   
     /*!
      * Checks whether this task has updated state and if so switches to it.

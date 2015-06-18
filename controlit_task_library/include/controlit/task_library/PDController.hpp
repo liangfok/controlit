@@ -50,15 +50,17 @@ struct PDController
      * parameters.
      */
     virtual void declareParameters(controlit::ParameterReflection* pr) = 0;
-  
+
     /*!
      * Resizes internal state vectors to be of the correct dimension.
      *
      * \param dimension The desired size of the vectors.
+     * \param initDefault Whether to initialize incorrectly-sized
+     * parameters to default values (default is false).
      * \return Whether the resize operation was successful.
      */
-    virtual bool resize(int dimension) = 0;
-  
+    virtual bool resize(int dimension, bool initDefault = false) = 0;
+
     /*!
      * Computes the next command based on the current state.
      *
@@ -73,7 +75,7 @@ struct PDController
     virtual bool computeCommand(Vector const& xd, Vector const& x,
            Vector const& xd_dot, Vector const& x_dot,
            Vector& u, controlit::ParameterReflection* pr) = 0;
-  
+
     /*!
      * Computes the next command based on the current state.
      *

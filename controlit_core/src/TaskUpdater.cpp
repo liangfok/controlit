@@ -230,6 +230,9 @@ void TaskUpdater::updateLoop()
                     << currTask->getTypeName())
 
                 currTask->updateState(model);
+
+                if (currTask->isSensing())
+                    currTask->sense(*model);
             }
 
             #ifdef TIME_TASK_STATE_UPDATE

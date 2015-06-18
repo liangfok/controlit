@@ -59,14 +59,28 @@ public:
      *
      * \return true if enabled.
      */
-    bool isEnabled() const; 
+    bool isEnabled() const { return enableState == EnableState::ENABLED; }
+
+    /*!
+     * Returns whether this WBC primitive is sensing.
+     *
+     * \return true if sensing.
+     */
+    bool isSensing() const { return enableState == EnableState::SENSING; }
 
     /*!
      * Returns the enable state of this WBC primitive.
      *
-     * \return true if this plan element is enabled.
+     * \return the enble state as an integer.
      */
-    int getEnableState() const;
+    int getEnableState() const { return enableState; }
+
+    /*!
+     * Returns the enable state of this WBC primitive.
+     *
+     * \return the enble state as a string.
+     */
+    std::string getEnableStateString() const;
   
     /*!
      * Generates a string representation of this class.
