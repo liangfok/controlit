@@ -2,15 +2,15 @@
 <package format="2">
 
     <name>controlit_core</name>
-    
+
     <version>0.0.0</version>
 
     <description>
         Contains the core ControlIt! components.
     </description>
-    
+
     <license>LGPLv2.1</license>
-    
+
     <url>http://ros.org/wiki/controlit_core</url>
 
     <maintainer email="liangfok@utexas.edu">Chien-Liang Fok</maintainer>
@@ -31,7 +31,7 @@
     <!-- Use test_depend for packages you need only for testing: -->
     <!--   <test_depend>gtest</test_depend> -->
     <buildtool_depend>catkin</buildtool_depend>
-    
+
     <depend>cmake_modules</depend>
     <depend>roscpp</depend>
     <depend>rospy</depend>
@@ -44,7 +44,7 @@
     <depend>controlit_model</depend>
     <depend>controlit_dependency_addons</depend>
     <depend>controlit_logging</depend>
-    
+
 <!--     <depend package="std_msgs" />
     <depend package="geometry_msgs" />
     <depend package="sensor_msgs" />
@@ -57,7 +57,7 @@
     <depend package="controlit_cmake" />
     <depend package="controlit_dependency_addons" />
     <depend package="controlit_logging" /> -->
-    
+
     <export>
         <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lcontrolit_core" />
         <controlit plugin="${prefix}/tests/factories/controlit_example_plugin.xml" />

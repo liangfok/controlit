@@ -21,7 +21,7 @@ macro(controlit_build_init)
 
     # Print the compiler flags
     message(STATUS "CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
-    
+
     # Make current project's path available to C preprocessor
     add_definitions(-DPROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 
