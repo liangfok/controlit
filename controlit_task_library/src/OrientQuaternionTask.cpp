@@ -153,20 +153,43 @@ bool OrientQuaternionTask::init(ControlModel & model)
 
     if (goalPosition_.rows() != 4)
     {
-        CONTROLIT_ERROR << "Goal position must have 4 (quaternion!) dimensions, got " << goalPosition_.rows();
-        return false;
+        if (getEnableState() == EnableState::SENSING)
+        {
+            // Set goal position equal to [0, 1, 0, 0] (w, x, y, z)
+            goalPosition_.setZero(4);
+            goalPosition_[1] = 1;
+        }
+        else
+        {
+            CONTROLIT_ERROR << "Goal orientation must have 4 (w, x, y, z quaternion) dimensions, got " << goalPosition_.rows();
+            return false;
+        }
     }
 
     if (controlPoint_.rows() != 4)
     {
-        CONTROLIT_ERROR << "Control point must have 4 (quaternion!) dimensions, got " << controlPoint_.rows();
-        return false;
+        if (getEnableState() == EnableState::SENSING)
+        {
+            // Set control point equal to [0, 1, 0, 0] (w, x, y, z)
+            controlPoint_.setZero(4);
+            controlPoint_[1] = 1;
+        }
+        else
+        {
+            CONTROLIT_ERROR << "Control point must have 4 (w, x, y, z quaternion) dimensions, got " << controlPoint_.rows();
+            return false;
+        }
     }
 
     if (goalVelocity_.rows() != 3)
     {
-        CONTROLIT_ERROR << "Goal velocity must have 3 dimensions, got " << goalVelocity_.rows();
-        return false;
+        if (getEnableState() == EnableState::SENSING)
+            goalVelocity_.setZero(3);
+        else
+        {
+            CONTROLIT_ERROR << "Goal velocity must have 3 dimensions, got " << goalVelocity_.rows();
+            return false;
+        }
     }
 
     // Create a real-time-safe ROS topic publisher for visualizing the current and goal
