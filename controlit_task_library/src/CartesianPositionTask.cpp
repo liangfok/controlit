@@ -136,8 +136,7 @@ bool CartesianPositionTask::init(ControlModel & model)
             projection_.setIdentity(3, 3);
         else
         {
-            CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Projection matrix must have "
-               "size 3 x 3, got "<< projection_.rows() <<" x "<<projection_.cols();
+            CONTROLIT_ERROR << "Projection matrix must have size 3 x 3, got "<< projection_.rows() <<" x "<<projection_.cols();
             return false;
         }
     }
@@ -148,8 +147,7 @@ bool CartesianPositionTask::init(ControlModel & model)
             controlPoint_.setZero(3);
         else
         {
-            CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Control point must have "
-                   "3 dimensions, got " << controlPoint_.rows();
+            CONTROLIT_ERROR << "Control point must have 3 dimensions, got " << controlPoint_.rows();
             return false;
         }
     }
@@ -160,8 +158,7 @@ bool CartesianPositionTask::init(ControlModel & model)
             goalPosition_.setZero(3);
         else
         {
-            CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Goal position must have "
-                   "3 dimensions, got " << goalPosition_.rows();
+            CONTROLIT_ERROR << "Goal position must have 3 dimensions, got " << goalPosition_.rows();
             return false;
         }
     }
@@ -172,8 +169,7 @@ bool CartesianPositionTask::init(ControlModel & model)
             goalVelocity_.setZero(3);
         else
         {
-            CONTROLIT_ERROR << "ERROR: CartesianPositionTask::init: Goal Velocity must have "
-                   "3 dimensions, got " << goalVelocity_.rows();
+            CONTROLIT_ERROR << "Goal Velocity must have 3 dimensions, got " << goalVelocity_.rows();
             return false;
         }
     }
