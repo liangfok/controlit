@@ -2,7 +2,7 @@
 
 '''
 Generates a trajectory from the joint's current position to
-its desired position. The velocity vs. time plot of the 
+its desired position. The velocity vs. time plot of the
 trajectory looks like a trapezoid.
 
 See: https://humancenteredrobotics.atlassian.net/wiki/display/WBC/2015.02.19+A+Trapezoid+Velocity+Trajectory+Generator
@@ -71,7 +71,7 @@ class TrapezoidVelocityTrajGen:
             self.vSteady = abs(self.vSteady)
             self.aAccel = abs(self.aAccel)
             self.aDecel = -1 * abs(self.aDecel)
-        
+
         # Compute time spent acelerating and decelerating assuming vSteady is reached.
         tAccel = abs(self.vSteady / self.aAccel)
         tDecel = abs(self.vSteady / self.aDecel)
@@ -87,7 +87,7 @@ class TrapezoidVelocityTrajGen:
               "  - time decelerating = {4}\n"\
               "  - distance accelerating and decelerating = {5}\n"\
               "  - total distance = {6}".format(
-                self.vSteady, self.aAccel, self.aDecel, tAccel, tDecel, dAccel, 
+                self.vSteady, self.aAccel, self.aDecel, tAccel, tDecel, dAccel,
                 abs(self.xFinal - self.xInit))
 
         if dAccel > abs(self.xFinal - self.xInit):
@@ -99,10 +99,10 @@ class TrapezoidVelocityTrajGen:
                   "  - deceleration distance: {4}\n"\
                   "  - total distance needed: {5}\n"\
                   "  - total distance to travel: {6}".format(
-                    self.vSteady, 
-                    tAccel, 
-                    tDecel, 
-                    tAccel * abs(self.vSteady) / 2, 
+                    self.vSteady,
+                    tAccel,
+                    tDecel,
+                    tAccel * abs(self.vSteady) / 2,
                     tDecel * abs(self.vSteady) / 2,
                     dAccel,
                     abs(self.xFinal - self.xInit))
@@ -176,7 +176,7 @@ class TrapezoidVelocityTrajGen:
 
         # Get the current time. The trajectory will be determined relative to this time point.
         t0 = rospy.get_rostime()
-        
+
         print "TrapezoidVelocityTrajGen: start: Starting at time t0 = {0}\n".format(t0.to_sec())
 
         doneTraj = False
