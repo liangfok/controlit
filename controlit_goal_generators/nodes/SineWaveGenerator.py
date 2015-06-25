@@ -152,7 +152,7 @@ if __name__ == "__main__":
         elif opt in ("-n", "--numDoFs"):
             numDoFs = int(arg)
         elif opt in ("-j", "--jointIndex"):
-            jointIndex = int(arg)            
+            jointIndex = int(arg)
         elif opt in ("-p", "--period"):
             period = float(arg)
         elif opt in ("-f", "--updateFreq"):

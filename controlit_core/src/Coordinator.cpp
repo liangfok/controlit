@@ -156,8 +156,8 @@ bool Coordinator::init()
         controller.reset(controllerFactory.createController(controlitParameters.getControllerType()));
         if (controller.get() == nullptr)
         {
-            CONTROLIT_ERROR 
-                << "Failed to create a whole body controller of type \"" 
+            CONTROLIT_ERROR
+                << "Failed to create a whole body controller of type \""
                 << controlitParameters.getControllerType() << "\"!";
             return false;
         }
@@ -223,7 +223,7 @@ bool Coordinator::init()
     }
 
     // Create a real-time publisher of the model staleness
-    
+
     while (!modelStalenessPublisher.trylock()) usleep(200);
     modelStalenessPublisher.msg_.data = 0;
     modelStalenessPublisher.unlockAndPublish();
@@ -258,7 +258,7 @@ bool Coordinator::init()
     }
 
     jointStatePublisher.unlockAndPublish();
-    
+
 
     // Create a service for getting the controller configuration
     getControllerConfigService = nh.advertiseService("diagnostics/getControllerConfiguration",
@@ -280,7 +280,7 @@ bool Coordinator::getControllerConfigServiceHandler(controlit_core::getControlle
     std::stringstream msgBuff;
     msgBuff << "===========================================================" << std::endl;
     // msgBuff << "State as of time offset " << deltaTime << /*sstream.str() <<*/ "s:" << std::endl;
-    
+
     compoundTask->dump(msgBuff, "");
     model->get()->getConstraintSet()->dump(msgBuff, "");
     msgBuff << "===========================================================" << std::endl;
@@ -360,7 +360,7 @@ void Coordinator::servoUpdate()
 
     // Update the time when the servo loop last executed
     servoFreqTimer->start();
-    
+
     // updateLatencyStat.startTimer();
 
     // #ifdef TIME_CONTROLIT_CONTROLLER_UPDATE
@@ -385,9 +385,9 @@ void Coordinator::servoUpdate()
     //         struct timeval tv;
     //         time_t curtime;
 
-    //         gettimeofday(&tv, NULL); 
+    //         gettimeofday(&tv, NULL);
     //         curtime=tv.tv_sec;
-          
+
     //         strftime(buffer,30,"%m-%d-%Y  %T.", localtime(&curtime));
 
     //         CONTROLIT_INFO_RT << "Receiving first state at time " << buffer << tv.tv_usec;
@@ -415,7 +415,7 @@ void Coordinator::servoUpdate()
         jointStatePublisher.unlockAndPublish();
     }
 
-    // Publish the odometry information.  This is the state of the virtual 6 DOFs that connect the 
+    // Publish the odometry information.  This is the state of the virtual 6 DOFs that connect the
     // robot to the world.
     geometry_msgs::TransformStamped odom_trans;
 
@@ -458,7 +458,7 @@ void Coordinator::servoUpdate()
     // Ensure the model is not stale!
     if(model->get()->isStale())
     {
-        CONTROLIT_WARN_RT 
+        CONTROLIT_WARN_RT
             << "Attempted to compute command using a stale model!"
             << "Aborting this round of the servo loop!";
     }
@@ -508,15 +508,15 @@ void Coordinator::servoUpdate()
         //     struct timeval tv;
         //     time_t curtime;
 
-        //     gettimeofday(&tv, NULL); 
+        //     gettimeofday(&tv, NULL);
         //     curtime=tv.tv_sec;
-          
+
         //     strftime(buffer,30,"%m-%d-%Y  %T.", localtime(&curtime));
 
         //     CONTROLIT_INFO_RT << "Sending first command at time " << buffer << tv.tv_usec;
         //     isFirstCommand = false;
         // }
-        
+
         // Write command to the robot
         robotInterface->write(command);
     }
@@ -663,7 +663,7 @@ bool Coordinator::loadCompoundTask(ros::NodeHandle &nh)
     // Bind parameters to ROS topics
     try
     {
-        if (!compoundTask->bindParameters(nh, bindingManager)) 
+        if (!compoundTask->bindParameters(nh, bindingManager))
             return false;
         // if (!bindingManager.bindParameters(nh, *(compoundTask.get())))
         //     return false;
@@ -686,7 +686,7 @@ bool Coordinator::loadCompoundTask(ros::NodeHandle &nh)
     }
 
     if (!compoundTask->addTasksToUpdater(taskUpdater)) return false;
-    
+
     PRINT_INFO_STATEMENT("Compound task and task updater loaded.");
 
     return true;
@@ -815,7 +815,7 @@ bool Coordinator::computeCommand()
     double endComputeCommand = computeCommandTimer->getTime();
     #endif
 
-    if (!result) 
+    if (!result)
     {
         return false;
         // TODO: go into a safe mode that parks the robot.
@@ -826,7 +826,7 @@ bool Coordinator::computeCommand()
         {
             double age = model->get()->getAge();
             modelStalenessPublisher.msg_.data = age;
-            modelStalenessPublisher.unlockAndPublish();   
+            modelStalenessPublisher.unlockAndPublish();
         }
     }
 

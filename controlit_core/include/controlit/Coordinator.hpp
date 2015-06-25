@@ -26,6 +26,7 @@
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/Float64.h>
 
+#include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 #include <tf/message_filter.h>
 #include <message_filters/subscriber.h>
@@ -61,11 +62,7 @@
 #include <controlit_core/get_inertia_matrix.h>
 #include <controlit_core/getControllerConfig.h>
 
-
 #include <chrono>
-
-
-#include <tf/transform_broadcaster.h>
 
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;

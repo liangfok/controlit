@@ -328,25 +328,25 @@ ConstraintSet::ConstraintList_t const& ConstraintSet::getConstraintSet()
 void ConstraintSet::addConstraint(Constraint* constraint)
 {
     PRINT_DEBUG_STATEMENT("Method called!");
-  
+
     // It is possible for a constraint to be added after this ConstraintSet is initialized.
     // When this happens, care must be taken to re-initialize this ConstraintSet.
     // assert(!initialized_);
-  
+
     std::shared_ptr<Constraint> constraintSharedPointer(constraint);
     //Need to put a check here!!!!!
-  
+
     // Tell our parent class this is another parameter collection
     if (!addParameterCollection(constraintSharedPointer))
     {
         CONTROLIT_PR_ERROR << "Failed to add constraint '" << constraint->getInstanceName() << "' as a parameter collection. Aborting add.";
         return;
     }
-  
+
     constraintSet_.push_back(constraintSharedPointer);
-  
+
     PRINT_DEBUG_STATEMENT("Added constraint '" << constraint->getInstanceName() << "'");
-  
+
     // The constraint set just changed; declare it uninitialized.
     initialized_ = false;
 }
@@ -378,13 +378,13 @@ ConstraintSet::ActuatedJointIds_t const& ConstraintSet::getActuatedJointIndices(
 size_t ConstraintSet::getNConstraints() const
 {
     size_t result = 0;
-  
+
     for(auto const& constraint : constraintSet_)
     {
         if (constraint->isEnabled())
             result++;
     }
-  
+
     return result;
 }
 
@@ -474,7 +474,7 @@ unsigned int ConstraintSet::getNConstrainedDOFs() const
 void ConstraintSet::updateJc(RigidBodyDynamics::Model& robot, const Vector& Q)
 {
     //assert(initialized_);
-  
+
     int r = 0; //row counter
     for (auto & constraint : constraintSet_)
     {
@@ -483,7 +483,7 @@ void ConstraintSet::updateJc(RigidBodyDynamics::Model& robot, const Vector& Q)
             //TODO: constraints store and initialize their own jacobian matrix!
             Matrix Jci(constraint->getNConstrainedDOFs(), robot.dof_count);
             constraint->getJacobian(robot, Q, Jci);
-      
+
             for(size_t ii = 0; ii < constraint->getNConstrainedDOFs(); ii++)
                 Jc_.row(r++) = Jci.row(ii);
         }
@@ -497,7 +497,7 @@ void ConstraintSet::resize(unsigned int dof, unsigned int consDOFcount,
         Jc_.setZero(consDOFcount, dof);
     else
         Jc_.setIdentity(dof, dof);  // No constraints
-  
+
     U_.setZero(dof - unactDOFcount - virtualDOFcount, dof);
     virtualU_.setZero(dof - virtualDOFcount, dof);
     JcBar_.setZero(Jc_.cols(), Jc_.rows());
@@ -505,7 +505,7 @@ void ConstraintSet::resize(unsigned int dof, unsigned int consDOFcount,
     UNc_.setZero(U_.rows(), Nc_.cols());
     UNcAiNorm_.setZero(UNc_.rows(), UNc_.rows());
     UNcBar_.setZero(UNc_.cols(), UNc_.rows());
-  
+
     Id_col.setIdentity(dof, dof);
     Id_row.setIdentity(consDOFcount, consDOFcount);
 }
@@ -516,10 +516,10 @@ void ConstraintSet::dump(std::ostream& os, std::string const& prefix) const
     os << prefix << "  Type: " << getTypeName() << std::endl;
     os << prefix << "  Name: " << getInstanceName() << std::endl;
     os << prefix << "  Constraints:" << std::endl;
-  
+
     if (constraintSet_.size() == 0)
         os << prefix << "    [None]" << std::endl;
-  
+
     for(auto & constraint : constraintSet_) // For each constraint
     {
         os << prefix << "    Constraint: "

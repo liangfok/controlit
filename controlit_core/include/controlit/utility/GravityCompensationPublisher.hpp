@@ -44,12 +44,12 @@ public:
      * The constructor.
      */
     GravityCompensationPublisher();
-  
+
     /*!
      * The destructor.
      */
     ~GravityCompensationPublisher() {}
-  
+
     /*!
      * Initializes this class by loading the parameters from the ROS
      * parameter server.
@@ -59,7 +59,7 @@ public:
      * in published gravity compensation vector.
      */
     bool init(ros::NodeHandle & nh, const std::vector<std::string> & actuatedJointNames);
-  
+
     /*!
      * Publish the gravity compensation vector.
      *
@@ -75,12 +75,12 @@ public:
         const Vector & jointPositions, const Vector & jointVelocities);
 
 private:
-  
+
     /*!
      * Remembers the number of times the publish method was called.
      */
     size_t callCounter;
-  
+
     /*!
      * This is the publisher.
      */

@@ -62,15 +62,15 @@ bool WBOSC::init(ros::NodeHandle & nh, ControlModel & model,
 {
     // Ensure this WBOSC is initialized once
     assert(!initialized);
-  
+
     // Save the pointer to the object holding WBC's parameters
     this->controlitParameters = controlitParameters;
 
     this->timer = timer;
-  
+
     // Initialize the gravity compensation vector publisher
     gravityCompensationPublisher.init(nh, model.getActuatedJointNamesVector());
-  
+
     if (reinit(model))
     {
         initialized = true;
@@ -78,31 +78,30 @@ bool WBOSC::init(ros::NodeHandle & nh, ControlModel & model,
     }
     else
         return false;
-    
 }
 
 bool WBOSC::reinit(ControlModel & model)
 {
     // Get the number of actuable DOFs
     int numDOFs = model.getNActuableDOFs();
-  
+
     // Reset the gravityComp vector
     if (gravityComp.size() != numDOFs)
     {
         gravityComp.resize(numDOFs);
         gravityComp.setZero(numDOFs);
     }
-  
+
     // Reset the identity matrix with size numDOFs x numDOFs
     identityActuableDOFs.setIdentity(numDOFs, numDOFs);
-  
+
     // Initialize the fcomp and pstar vectors
     pstar.setZero(numDOFs); // This is over-allocating. fcomp at each level is # of rows in Jacobien.
     fcomp.setZero(numDOFs); // This is over-allocating. pstar at each level is # of rows in Jacobian.
-  
+
     // Save the actuated joint names.  This is used by the getEquivalentDampingGainsHandler service.
     // actuatedJointNames = & model.getActuatedJointNamesVector();
-  
+
     return true;
 }
 
@@ -110,7 +109,7 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
 {
     // CONTROLIT_DEBUG_RT << "Method called! \n"
     //              " - model.getQ() = " << model.getQ().transpose();
-  
+
     // #define TIME_TORQUE_CONTROLLER_COMPUTE_COMMAND 1
 
     #ifdef TIME_TORQUE_CONTROLLER_COMPUTE_COMMAND
@@ -119,14 +118,14 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
 
     // Get the number of actuable DOFs
     int numDOFs = model.getNActuableDOFs();
-  
+
     // Ensure output variables are property allocated
     assert(command.getEffortCmd().size() == numDOFs);
     assert(command.getPositionCmd().size() == numDOFs);
     assert(command.getVelocityCmd().size() == numDOFs);
     assert(command.getEffectiveKp().size() == numDOFs);
     assert(command.getEffectiveKd().size() == numDOFs);
-  
+
     // Get references to various useful matricies and vector.
     const Matrix & Ai = model.getAinv();
     const Matrix & UNcAiNorm = model.constraints().getUNcAiNorm();
@@ -134,41 +133,41 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
     // const Matrix & Nc = model.constraints().getNc();
     // const Matrix & UNc = model.constraints().getUNc();
     // const Vector & grav = model.getGrav();
-  
+
     // Initialize Nhp, the null space of higher priority tasks, to be identity.
     Nhp = identityActuableDOFs;
-  
+
     // CONTROLIT_DEBUG_RT << "Input variables:\n"
     //      " - ControlModel name = " << model.getName() << "\n"
     //      " - numDOFs = " << numDOFs << "\n"
     //      " - Ai = \n" << Ai << "\n"
     //      " - grav = " << grav.transpose();
-  
+
     CompoundTask::TaskCommands taskCommands;
     CompoundTask::TaskJacobians taskJacobians;
     CompoundTask::TaskTypes taskTypes;
-  
+
     #ifdef TIME_TORQUE_CONTROLLER_COMPUTE_COMMAND
     timeBookkeeping = timer->getTime();
     #endif
-  
-    if (!compoundTask.getJacobianAndCommand(model, taskJacobians, taskCommands, taskTypes)) 
+
+    if (!compoundTask.getJacobianAndCommand(model, taskJacobians, taskCommands, taskTypes))
         return false;
-  
+
     #ifdef TIME_TORQUE_CONTROLLER_COMPUTE_COMMAND
     timeGetJacobianAndCommand = timer->getTime() - timeBookkeeping;
     #endif
-  
+
     bool hasInternalForceTask = compoundTask.hasInternalForceTask();
     size_t internalForceTaskPriority = compoundTask.getInternalForceTaskPriority();
     int numPrevTasks = 0;
-  
+
     gravityComp.setZero(numDOFs);
-  
+
     #ifdef TIME_TORQUE_CONTROLLER_COMPUTE_COMMAND
     std::vector<double> latencyComputeTaskCommand;
     #endif
-  
+
     // For each task priority level
     for(size_t priority = 0; priority < taskCommands.size(); priority++)
     {
@@ -177,7 +176,7 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
         #ifdef TIME_TORQUE_CONTROLLER_COMPUTE_COMMAND
         timer->start(); // reset the timer
         #endif
-    
+
         // If the priority level is not empty and does not belong to the internal force task
         if(taskCommands[priority].size() > 0 &&
           (!hasInternalForceTask || (hasInternalForceTask && priority != internalForceTaskPriority)))
@@ -188,30 +187,30 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
             //   << " - size of taskCommands[" << priority << "]: " << taskCommands[priority].size() << "\n"
             //   << " - size of UNcBar: (" << UNcBar.rows() << "x" << UNcBar.cols() << ")\n"
             //   << " - size of Nhp: (" << Nhp.rows() << "x" << Nhp.cols() << ")";
-      
+
             // Jstar tells you the feasibility of the task.  In other words it expresses the task space.
             // For example, if your legs are straight, you cannot move anymore.
             Matrix Jstar = taskJacobians[priority] * UNcBar * Nhp; //Nhp is identity for top level task.  It is the nullspace of all higher priority tasks
-      
+
             // CONTROLIT_DEBUG_RT << "Done computing Jstar";
-      
+
             // CONTROLIT_DEBUG_RT << "Computing inverseLstar:\n"
             //   << " - Priority: " << priority << "\n"
             //   << " - size of Jstar: (" << Jstar.rows() << "x" << Jstar.cols() << ")\n"
             //   << " - size of UNcAiNorm: (" << UNcAiNorm.rows() << "x" << UNcAiNorm.cols() << ")";
-      
+
             // TODO: Remove this dynamic allocation
             Matrix inverseLstar = Jstar * UNcAiNorm * Jstar.transpose();
-      
+
             // Lstar tells you the ability to do something dynamic.
             // For example, if you spin your arms fast enough, maybe you can lift off the ground.
             // TODO: Remove this dynamic allocation
             Lstar.resize(inverseLstar.cols(), inverseLstar.rows());
-      
+
             // std::cout<<"Lstar["<<priority<<"] = \n"<<Lstar<<std::endl;
-      
+
             // CONTROLIT_DEBUG_RT << "Done computing inverseLstar";
-      
+
             // CONTROLIT_DEBUG_RT
             //   // << std::scientific << std::fixed << std::setprecision(std::numeric_limits<double>::digits10 + 1)
             //   << "Details of matrix to be inverted:\n"
@@ -220,7 +219,7 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
             //   << " - taskJacobians:\n" << taskJacobians[priority] << "\n"
             //   << " - UNcBar:\n" << UNcBar << "\n"
             //   << " - Nhp:\n" << Nhp;
-      
+
             // std::stringstream msgBuff;
             // for (int ii = 0; ii < inverseLstar.rows(); ii++)
             // {
@@ -233,14 +232,14 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
             //   msgBuff << ",\n";
             // }
             // CONTROLIT_DEBUG_RT << "Here's code for initializing the matrix.  Size = " << inverseLstar.rows() << "x" << inverseLstar.cols() << ":\n" << msgBuff.str();
-      
+
             // ros::Time startMethodCall = ros::Time::now();
-      
+
             // CONTROLIT_INFO << "Computing pseudoInverse";
             controlit::addons::eigen::pseudo_inverse(inverseLstar, Lstar); //, compoundTask.getSigmaThreshold());
-      
+
             // CONTROLIT_DEBUG_RT << "Done computing Lstar";
-      
+
             // for(size_t ii = 0; ii < Lstar.rows(); ii++)
             //   for(size_t jj = 0; jj < Lstar.rows(); jj++)
             //     if(ii != jj)
@@ -248,12 +247,12 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
             //       Lstar(ii,jj) *= 0.3;
             //       Lstar(jj,ii) *= 0.3;
             //     }
-      
+
             // CONTROLIT_DEBUG_RT << std::scientific << std::fixed << std::setprecision(std::numeric_limits<double>::digits10 + 1)
             //   << __func__ << ": Results of controlit::addons::eigen::pseudo_inverse:\n" << Lstar;
-      
+
             // double latency = (ros::Time::now() - startMethodCall).toSec();
-      
+
             // CONTROLIT_DEBUG_RT << "Latency of controlit::addons::eigen::pseudo_inverse method call:\n"
             //      " - priority level: " << priority << "\n"
             //      " - size of input matrix: " << temp.rows() << "x" << temp.cols() << "\n"
@@ -262,11 +261,11 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
             //      // " - condition of input matrix: " << (singularValues.minCoeff() > 0 ? (singularValues.maxCoeff() / singularValues.minCoeff()) : -1) << "\n"
             //      " - latency: " << latency * 1e3 << "\n"
             //      " - numRounds: " << numRounds;
-      
+
             // This is debug code that sets Lstar = identity, which effectively
             // disables WBC.
             // Lstar.setIdentity(model.getNActuableDOFs(), model.getNActuableDOFs());
-      
+
             // Compute pstar
             // Dimensions:
             //  - pstar = # task DOFs
@@ -276,28 +275,28 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
             //  - Ai = # DOFs x # DOFs
             //  - Nc.transpose = # DOFs x # DOFs
             //  - grav = # DOFs
-      
-      
+
+
 
             pstar.setZero(Lstar.rows());  // disable task-specific gravity comp
             // pstar = Lstar * Jstar * UNc * Ai * Nc.transpose()* grav;
             // pstar.setZero();
             // std::cout<<"pstar = "<<pstar.transpose()<<"std::endl";
             // gravityComp.noalias() += pstar;
-      
+
             // CONTROLIT_DEBUG_RT << "Done setting pstar";
-      
+
             // Print this to determine the "effective" gains.
             // The "effective" gains are the actual gains * the corresponding value in the matrix's diagnal.
             // CONTROLIT_DEBUG_RT << "Lstar:\n" << Lstar;
-      
+
             if (numPrevTasks == 0)
             {
                 if(taskTypes[priority] == CommandType::ACCELERATION)
                     command.getEffortCmd() = Jstar.transpose() * (Lstar * taskCommands[priority] + pstar);
                 else //CommandType::FORCE
                     command.getEffortCmd() = Jstar.transpose() * (taskCommands[priority] + pstar);
-        
+
                 // CONTROLIT_DEBUG_RT << "Controller State:\n"
                 //      " - gamma = " << gamma.transpose() << "\n"
                 //      " - Q = " << model.getQ().transpose() << "\n"
@@ -324,7 +323,7 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
                 else //CommandType::FORCE
                     command.getEffortCmd().noalias() += Jstar.transpose() * (taskCommands[priority] + pstar - fcomp);
             }
-      
+
             if (!containerUtility.checkMagnitude(command.getEffortCmd(), INFINITY_THRESHOLD))
             {
                 CONTROLIT_ERROR_RT << "Invalid effortCmd after accounting for priority " << priority << " tasks!\n"
@@ -341,18 +340,18 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
                        " - taskCommands[" << priority << "] = " << taskCommands[priority].transpose() << "\n"
                        " - pstar = " << pstar.transpose() << "\n"
                        " - fcomp = " << fcomp.transpose();
-          
+
                 return false;
             }
-      
+
             if (priority < taskCommands.size() - 1) // Avoid last calculation
             {
                 Nhp = (identityActuableDOFs - UNcAiNorm * Jstar.transpose() * Lstar * Jstar) * Nhp; //check order of projection
             }
-      
+
             numPrevTasks++;
         }
-    
+
         #ifdef TIME_TORQUE_CONTROLLER_COMPUTE_COMMAND
         latencyComputeTaskCommand.push_back(timer->getTime());
         #endif
@@ -365,7 +364,7 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
     // Calculate and add joint space gravity compensation to the command.
     // Then publish the gravity compensation vector for debugging and monitoring purposes.
     gravityComp = UNcBar.transpose() * model.getGrav();
-    command.getEffortCmd().noalias() += gravityComp;     
+    command.getEffortCmd().noalias() += gravityComp;
     gravityCompensationPublisher.publish(gravityComp, model.getActuableQ(), model.getActuableQd());
 
     #ifdef TIME_TORQUE_CONTROLLER_COMPUTE_COMMAND
@@ -417,22 +416,22 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
         const Matrix & Wint = model.virtualLinkageModel().getWint();
         const Matrix & Lstar = model.virtualLinkageModel().getLstar();
         const Matrix & U = model.virtualLinkageModel().getU();
-    
+
         Jlstarbar = Lstar * U * Jsbar * Wint.transpose();
-    
+
         // TODO: Move this into an init method
         Jlstar.resize(Jlstarbar.cols(), Jlstarbar.rows());
-    
+
         // CONTROLIT_INFO << "Computing pseudoInverse";
         controlit::addons::eigen::pseudo_inverse(Jlstarbar, Jlstar); //, compoundTask.getSigmaThreshold());
-    
+
         //Matrix Id7(7,7); Id7.setIdentity();
         //std::cout<<"Jlstar * Jlstarbar = \n"<<(Jlstar * Jlstarbar)<<std::endl;
-    
+
         pl = Wint * Jsbar.transpose() * model.getGrav();
-    
+
         Fint = Wint * Jsbar.transpose() * U.transpose() * command.getEffortCmd(); // getEffortCmd() is the sum of all operation and joint space tasks.
-    
+
         if (!containerUtility.checkMagnitude(Fint, INFINITY_THRESHOLD))
         {
             CONTROLIT_ERROR_RT << "Invalid Fint!\n"
@@ -443,25 +442,25 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
                    " - Wint = " << Wint;
             return false;
         }
-    
+
         FintRef = taskCommands[internalForceTaskPriority];
-    
+
         // CONTROLIT_DEBUG_RT << "About to add VLM command:\n"
         //        " - Size of Lstar.transpose(): (" << Lstar.transpose().rows() << "x" << Lstar.transpose().cols() << ")\n"
         //        " - Size of Jlstar.transpose(): (" << Jlstar.transpose().rows() << "x" << Jlstar.transpose().cols() << ")\n"
         //        " - Size of FintRef: " << FintRef.size() << "\n"
         //        " - Size of Fint: " << Fint.size() << "\n"
         //        " - Size of pl: " << pl.size();
-    
-    
+
+
         // Vector intCommand = Lstar.transpose() * Jlstar.transpose() * (FintRef - Fint + pl);
         // Vector check = UNc.transpose() * intCommand;
         //std::cout<<"norm of UNc.transpose * Lstar.transpose * Jlstar.transpose = \n"<<UNc.transpose() * Lstar.transpose() * Jlstar.transpose()<<std::endl;
         // std::cout<<"norm of UNc.transpose * intCommand = "<<check.norm()<<std::endl;
         //std::cout<<"norm of UNc.transpose * Lstar.transpose = "<<(UNc.transpose() * Lstar.transpose()).norm()<<std::endl;
-    
+
         command.getEffortCmd().noalias() += Lstar.transpose() * Jlstar.transpose() * (FintRef - Fint + pl); //Check sign of pl.
-    
+
         if (!containerUtility.checkMagnitude(command.getEffortCmd(), INFINITY_THRESHOLD))
         {
             CONTROLIT_ERROR_RT << "Invalid effortCmd after accounting for internal force task!\n"
@@ -495,7 +494,7 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
     #ifdef TIME_TORQUE_CONTROLLER_COMPUTE_COMMAND
     timeCheckMagnitude2 = timer->getTime() - timeAddVLM;
     #endif
-  
+
     #ifdef TIME_TORQUE_CONTROLLER_COMPUTE_COMMAND
 
     double total = timeBookkeeping + timeGetJacobianAndCommand + timeAddGravityComp +
@@ -519,10 +518,10 @@ bool WBOSC::computeCommand(ControlModel & model, CompoundTask & compoundTask, Co
         "  - timeAddVLM: " << timeAddVLM * 1e3 << "\n"
         "  - timeCheckMagnitude2: " << timeCheckMagnitude2 * 1e3);
     #endif
-  
+
     // CONTROLIT_DEBUG_RT << "Done method call:\n"
     //                 " - command = " << command.transpose();
-  
+
     return true;
 }
 
