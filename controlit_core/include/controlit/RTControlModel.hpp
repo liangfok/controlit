@@ -275,7 +275,8 @@ protected:
     /*!
      * For publishing the gravity vector (diagnostics).
      */
-    ros::Publisher gravityPublisher;
+    controlit::addons::ros::RealtimePublisher<std_msgs::Float64MultiArray>
+        gravityPublisher;
 
     /*!
      * The service that provides the constraint jacobian matrices.

@@ -21,9 +21,7 @@
 #include <controlit/RTControlModel.hpp>
 
 #include <controlit/Constraint.hpp>
-
 #include <controlit/logging/RealTimeLogging.hpp>
-#include <std_msgs/Float64MultiArray.h> // for transmitting Float64MultiArray messages containing the gravity vector
 
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
@@ -40,6 +38,8 @@ namespace controlit {
 // #define PRINT_DEBUG_STATEMENT_RT_ALWAYS(ss) CONTROLIT_DEBUG_RT << ss;
 #define PRINT_DEBUG_STATEMENT_RT_ALWAYS(ss) std::cout << ss << std::endl;
 
+#define QUEUE_SIZE 1
+
 RTControlModel::RTControlModel() :
     state(State::IDLE),
     isRunning(false),
@@ -48,8 +48,8 @@ RTControlModel::RTControlModel() :
     activeModel(nullptr),
     inactiveModel(nullptr),
     parameterBindingManager(nullptr),
-    modelUpdateLatencyPublisher("diagnostics/modelUpdateLatency", 1)
-    // controlModelUpdateStat("Control Model Update", MODEL_UPDATE_NUM_SAMPLES)
+    modelUpdateLatencyPublisher("diagnostics/modelUpdateLatency", QUEUE_SIZE),
+    gravityPublisher("diagnostics/gravityVector", QUEUE_SIZE)
 {
     PRINT_DEBUG_STATEMENT("Method Called!")
 }
@@ -125,28 +125,23 @@ bool RTControlModel::init(ros::NodeHandle & nh, RobotState * latestRobotState,
         return false;
     }
 
-    // For publishing the new gravity vector when the active model is updated
-    gravityPublisher = nh.advertise<std_msgs::Float64MultiArray>("diagnostics/gravityVector", 10);
+    // Create the publishers of the gravity vector and model update latency
+    while (!gravityPublisher.trylock()) usleep(200);
+    gravityPublisher.msg_.layout.dim.resize(2);
+    gravityPublisher.msg_.layout.dim[0].stride = activeModel->getNumDOFs();
+    gravityPublisher.msg_.layout.dim[0].size = activeModel->getNumDOFs();
+    gravityPublisher.msg_.layout.dim[1].stride = 1;
+    gravityPublisher.msg_.layout.dim[1].size = 1;
+    gravityPublisher.msg_.data.resize(activeModel->getNumDOFs());
+    gravityPublisher.unlockAndPublish();
 
-    // controlModelUpdateStat.reset();
+    while (!modelUpdateLatencyPublisher.trylock()) usleep(200);
+    modelUpdateLatencyPublisher.msg_.data = 0;
+    modelUpdateLatencyPublisher.unlockAndPublish();
 
     // Create the service handlers
     constraintJacobianService = nh.advertiseService("diagnostics/getConstraintJacobianMatrices",
         &RTControlModel::getConstraintJacobiansHandler, this);
-
-
-    // modelUpdateLatencyPublisher.reset(
-        // new controlit::addons::ros::RealtimePublisher<std_msgs::Float64>(nh, "diagnostics/modelUpdateLatency", 1));
-    if(modelUpdateLatencyPublisher.trylock())
-    {
-        modelUpdateLatencyPublisher.msg_.data = 0;
-        modelUpdateLatencyPublisher.unlockAndPublish();
-    }
-    else
-    {
-        CONTROLIT_ERROR_RT << "Unable to initialize modelUpdateLatencyPublisher!";
-        return false;
-    }
 
     initialized = true;
     return true;
@@ -419,23 +414,16 @@ bool RTControlModel::checkUpdate()
                 swap();
 
                 // Now that the model is updated, publish the new gravity vector
-                const Vector & grav = get()->getGrav();
-                std_msgs::Float64MultiArray gravityMsg;
-
-                gravityMsg.layout.dim.resize(2);
-                gravityMsg.layout.dim[0].stride = grav.size();
-                gravityMsg.layout.dim[0].size = grav.size();
-                gravityMsg.layout.dim[1].stride = 1;
-                gravityMsg.layout.dim[1].size = 1;
-                gravityMsg.data.resize(grav.size());
-
-                for (int ii = 0; ii < grav.size(); ii++)
+                if (gravityPublisher.trylock())
                 {
-                    gravityMsg.data[ii] = grav[ii];
+                    const Vector & grav = get()->getGrav();
+                    for (int ii = 0; ii < grav.size(); ii++)
+                    {
+                        gravityPublisher.msg_.data[ii] = grav[ii];
+                    }
+
+                    gravityPublisher.unlockAndPublish();
                 }
-
-                gravityPublisher.publish(gravityMsg);
-
 
                 PRINT_DEBUG_STATEMENT_RT("Done updating the ControlModel, setting ModelUpdate Thread's state to be IDLE")
 
@@ -546,11 +534,11 @@ void RTControlModel::updateLoop()
 
             if (modelUpdateLatencyPublisher.trylock())
             {
-                std::chrono::nanoseconds timeSpan 
+                std::chrono::nanoseconds timeSpan
                     = duration_cast<std::chrono::nanoseconds>(modelUpdateEndTime - modelUpdateStartTime);
                 double period = timeSpan.count() / 1e9;
                 modelUpdateLatencyPublisher.msg_.data = period;
-                modelUpdateLatencyPublisher.unlockAndPublish();   
+                modelUpdateLatencyPublisher.unlockAndPublish();
             }
         }
     }
