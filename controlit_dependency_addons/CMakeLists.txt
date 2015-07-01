@@ -10,7 +10,7 @@ project(controlit_dependency_addons)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
     roscpp
-    controlit_cmake 
+    controlit_cmake
     cmake_modules
 )
 

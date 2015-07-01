@@ -10,7 +10,7 @@
     </description>
 
     <license>LGPLv2.1</license>
-    
+
     <url>http://ros.org/wiki/controlit_dependency_addons</url>
 
     <maintainer email="liangfok@utexas.edu">Chien-Liang Fok</maintainer>
@@ -32,7 +32,7 @@
     <!--   <test_depend>gtest</test_depend> -->
     <buildtool_depend>catkin</buildtool_depend>
     <depend>controlit_cmake</depend>
-    
+
     <!-- <depend package="rospy"/>
     <depend package="roscpp"/>
     <depend package="sensor_msgs" /> -->
