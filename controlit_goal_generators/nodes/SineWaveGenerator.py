@@ -52,6 +52,7 @@ class SineWaveGenerator:
         self.rosTopic = rosTopic
         self.amplitude = amplitude
         self.offset = offset
+        self.numDoFs = numDoFs
         self.jointIndex = jointIndex
         self.updateFreq = updateFreq
         self.updatePeriod = 1.0 / updateFreq
@@ -95,7 +96,7 @@ class SineWaveGenerator:
 
             # Make the joint at jointIndex move in a sine wave.
             # Set all other joints to be at position zero.
-            for ii in range(0, numDoFs):
+            for ii in range(0, self.numDoFs):
                 self.goalMsg.data[ii] = 0
             self.goalMsg.data[self.jointIndex] = goal
 
