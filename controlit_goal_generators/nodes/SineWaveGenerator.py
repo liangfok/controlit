@@ -48,7 +48,7 @@ class SineWaveGenerator:
         """
 
         self.period = period
-        self.frequency = 1 / period
+        self.frequency = 1.0 / period
         self.rosTopic = rosTopic
         self.amplitude = amplitude
         self.offset = offset
@@ -88,11 +88,14 @@ class SineWaveGenerator:
         Starts the publishing of the sine wave.
         """
 
-        publisher = rospy.Publisher(self.rosTopic, Float64MultiArray)
+        publisher = rospy.Publisher(self.rosTopic, Float64MultiArray, queue_size = 1)
         startTime = time.time()
 
         while not rospy.is_shutdown():
-            goal = self.getSineSignal(time.time() - startTime, self.amplitude, self.offset, self.frequency)
+            deltaTime = time.time() - startTime
+            print "deltaTime = {0}".format(deltaTime)
+            goal = self.getSineSignal(deltaTime, self.amplitude, self.offset, self.frequency)
+            print "goal = {0}".format(goal)
 
             # Make the joint at jointIndex move in a sine wave.
             # Set all other joints to be at position zero.
