@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" 
+"""
 Tests a trapezoid velocity generator and publishes the
 generated trajectory onto a ROS topic.
 """
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Parse the command line arguments
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hi:f:v:a:d:f:",["xInit=", "xFinal=", 
+        opts, args = getopt.getopt(sys.argv[1:],"hi:f:v:a:d:f:",["xInit=", "xFinal=",
             "vSteady=", "aAccel=", "aDecel=", "updateFreq="])
     except getopt.GetoptError:
        rospy.logerr(usageStr)
@@ -73,11 +73,11 @@ if __name__ == "__main__":
 
     # Create the trajectory generator
     trajGen = TrapezoidVelocityTrajGen.TrapezoidVelocityTrajGen()
-    
+
     # Initialize the trajectory generator
     if not trajGen.init(xInit, xFinal, vSteady, aAccel, aDecel, updateFreq):
         rospy.signal_shutdown("done")
-        sys.exit(-1)    
+        sys.exit(-1)
 
     # Create the trajectory listener
     trajListener = SampleTrajectoryListener.SampleTrajectoryListener()
