@@ -74,21 +74,24 @@ bool RobotInterfaceUDP::init(ros::NodeHandle & nh, RTControlModel * model)
 
     controlit::addons::ros::ROSParameterAccessor paramInterface(nh);
 
-    if (!nh.getParam("RobotInterfaceUDP/address", address))
+    if (!nh.getParam("controlit/RobotInterfaceUDP/address", address))
     {
-        CONTROLIT_ERROR << "Unable to get address.";
+        CONTROLIT_ERROR << "Unable to get address from ROS parameter server.  "
+            << "Parameter: " << nh.getNamespace() << "controlit/RobotInterfaceUDP/address";
         return false;
     }
 
-    if (!nh.getParam("RobotInterfaceUDP/cmdPort", cmdPort))
+    if (!nh.getParam("controlit/RobotInterfaceUDP/cmdPort", cmdPort))
     {
-        CONTROLIT_ERROR << "Unable to get cmdPort.";
+        CONTROLIT_ERROR << "Unable to get cmdPort from ROS parameter server.  "
+            << "Parameter: " << nh.getNamespace() << "controlit/RobotInterfaceUDP/cmdPort";
         return false;
     }
 
-    if (!nh.getParam("RobotInterfaceUDP/statePort", statePort))
+    if (!nh.getParam("controlit/RobotInterfaceUDP/statePort", statePort))
     {
-        CONTROLIT_ERROR << "Unable to get statePort.";
+        CONTROLIT_ERROR << "Unable to get statePort from ROS parameter server.  "
+            << "Parameter: " << nh.getNamespace() << "controlit/RobotInterfaceUDP/statePort";
         return false;
     }
 
@@ -97,7 +100,7 @@ bool RobotInterfaceUDP::init(ros::NodeHandle & nh, RTControlModel * model)
              << "  - cmdPort: " << cmdPort << "\n"
              << "  - statePort: " << statePort;
 
-    //---------------------------------------------------------------------------------             
+    //---------------------------------------------------------------------------------
     // Initialize the UDP interface.
     //---------------------------------------------------------------------------------
 
@@ -107,10 +110,10 @@ bool RobotInterfaceUDP::init(ros::NodeHandle & nh, RTControlModel * model)
         return false;
     }
 
-    //---------------------------------------------------------------------------------          
-    // Initialize the odometry receiver.  
+    //---------------------------------------------------------------------------------
+    // Initialize the odometry receiver.
     // For now we receive this data from a ROS topic.
-    //---------------------------------------------------------------------------------          
+    //---------------------------------------------------------------------------------
 
     CONTROLIT_INFO_RT << "Creating and initializing the odometry state receiver...";
     odometryStateReceiver.reset(new OdometryStateReceiverROSTopic());
@@ -119,9 +122,9 @@ bool RobotInterfaceUDP::init(ros::NodeHandle & nh, RTControlModel * model)
 
 bool RobotInterfaceUDP::read(controlit::RobotState & latestRobotState, bool block)
 {
-    //---------------------------------------------------------------------------------          
+    //---------------------------------------------------------------------------------
     // Sanity check to ensure the number of DOFs received is correct.
-    //---------------------------------------------------------------------------------          
+    //---------------------------------------------------------------------------------
 
     if (rsMsg.state.num_dofs != latestRobotState.getNumJoints())
     {
@@ -132,9 +135,9 @@ bool RobotInterfaceUDP::read(controlit::RobotState & latestRobotState, bool bloc
     }
 
 
-    //---------------------------------------------------------------------------------          
+    //---------------------------------------------------------------------------------
     // Check whether we have received a state message.  Block if necessary.
-    //---------------------------------------------------------------------------------          
+    //---------------------------------------------------------------------------------
 
     if (rsMsg.seqno == -1)
     {
@@ -165,7 +168,7 @@ bool RobotInterfaceUDP::read(controlit::RobotState & latestRobotState, bool bloc
     // Check whether the sequence number was reflected.  If it was, compute and publish
     // the round trip communication latency.
     //---------------------------------------------------------------------------------
-    
+
     if (seqno == rsMsg.seqno)
     {
         double latency = rttTimer->getTime();
@@ -183,7 +186,7 @@ bool RobotInterfaceUDP::read(controlit::RobotState & latestRobotState, bool bloc
         latestRobotState.setJointVelocity(ii, rsMsg.state.velocity[ii]);
         latestRobotState.setJointEffort(ii, rsMsg.state.effort[ii]);
     }
-        
+
     //---------------------------------------------------------------------------------
     // Get and save the latest odometry data.
     //---------------------------------------------------------------------------------
@@ -199,7 +202,7 @@ bool RobotInterfaceUDP::read(controlit::RobotState & latestRobotState, bool bloc
     //---------------------------------------------------------------------------------
     // Call the the parent class' read method.  This causes the latestrobot state
     // to be published.
-    //--------------------------------------------------------------------------------- 
+    //---------------------------------------------------------------------------------
 
     return controlit::RobotInterface::read(latestRobotState, block);
 }
@@ -238,9 +241,9 @@ bool RobotInterfaceUDP::write(const controlit::Command & command)
     }
 
     //---------------------------------------------------------------------------------
-    // Call the the parent class' write method.  This causes the command to be 
+    // Call the the parent class' write method.  This causes the command to be
     // published.
-    //--------------------------------------------------------------------------------- 
+    //---------------------------------------------------------------------------------
 
     return controlit::RobotInterface::write(command);
 }
