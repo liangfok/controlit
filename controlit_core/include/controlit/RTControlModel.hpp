@@ -262,7 +262,7 @@ protected:
     std::mutex swapMutex;
 
     /*!
-     * This is the child thread that updates the inactive ControlModel.
+     * The thread that updates the inactive ControlModel.
      */
     std::thread thread;
 
