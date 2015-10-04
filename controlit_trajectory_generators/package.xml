@@ -8,17 +8,17 @@
     <description>
         Contains trajectory generators that can be used with ControlIt!.
     </description>
-    
+
     <license>LGPLv2.1</license>
-    
+
     <url>http://ros.org/wiki/controlit_trajectory_generators</url>
-  
+
     <maintainer email="liangfok@utexas.edu">Chien-Liang Fok</maintainer>
 
     <author>Chien-Liang Fok</author>
     <author>Gwendolyn Johnson</author>
     <author>J.D. Yamokoski</author>
-    
+
     <!-- The *_depend tags are used to specify dependencies -->
     <!-- Dependencies can be catkin packages or system dependencies -->
     <!-- Examples: -->
@@ -31,7 +31,7 @@
     <!-- Use test_depend for packages you need only for testing: -->
     <!--   <test_depend>gtest</test_depend> -->
     <buildtool_depend>catkin</buildtool_depend>
-        
+
     <!--
     <export>
       <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib"/>
