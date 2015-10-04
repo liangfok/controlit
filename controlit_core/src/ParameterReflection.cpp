@@ -76,7 +76,7 @@ BindingConfig * ParameterReflection::createROSOutputBinding(std::string paramNam
     return bc;
 }
 
-        
+
 
 bool ParameterReflection::hasParameter(std::string const& name) const
 {
@@ -102,7 +102,7 @@ bool ParameterReflection::addEvent(std::string const& name, std::string const& e
         CONTROLIT_ERROR << "Parameter " << name << " already exists in " << getInstanceName();
         return false;
     }
-  
+
     Event event;
     event.name = name;
     event.condition.SetExpr(expression);
@@ -112,12 +112,12 @@ bool ParameterReflection::addEvent(std::string const& name, std::string const& e
                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
     event.enabled = true;
     events.push_back(event);
-  
+
     // Record event as a new parameter
     addParameter(name, new double(0.0));
-  
+
     PRINT_INFO("Added event '" << name << "', expression '" << expression << "'");
-  
+
     return true;
 }
 
@@ -208,11 +208,11 @@ Parameter const* ParameterReflection::lookupParameter(std::string const& name) c
 Parameter* ParameterReflection::lookupParameter(std::string const& name, ParameterType type)
 {
     Parameter* parameter = lookupParameter(name);
-  
+
     if (parameter == NULL) return NULL;
     if (parameter->type() != type)
     {
-        CONTROLIT_PR_WARN 
+        CONTROLIT_PR_WARN
             << "Found parameter '" << name << "' but it was the wrong type. "
             << "Expected: " << type << ", actual: " << parameter->type();
         return NULL;
@@ -223,11 +223,11 @@ Parameter* ParameterReflection::lookupParameter(std::string const& name, Paramet
 Parameter const* ParameterReflection::lookupParameter(std::string const& name, ParameterType type) const
 {
     Parameter const* parameter = lookupParameter(name);
-  
+
     if (parameter == NULL) return NULL;
     if (parameter->type() != type)
     {
-        CONTROLIT_PR_WARN 
+        CONTROLIT_PR_WARN
             << "Found parameter '" << name << "' but it was the wrong type."
             << " Expected: " << type << ", got: " << parameter->type();
         return NULL;
@@ -238,7 +238,7 @@ Parameter const* ParameterReflection::lookupParameter(std::string const& name, P
 void ParameterReflection::dump(std::ostream& os, std::string const& title, std::string const& prefix) const
 {
     if (!title.empty()) os << title << "\n";
-  
+
     for (auto const& tuple : parameterMap)
         (tuple.second)->dump(os, prefix + "    ");
 }
@@ -246,7 +246,7 @@ void ParameterReflection::dump(std::ostream& os, std::string const& title, std::
 bool ParameterReflection::emitEvents()
 {
     bool st = true;
-  
+
     for (auto& event : events)
     {
         // Manually tie event evaluation to the parameter thats tracking it. Obvious thing
@@ -258,9 +258,9 @@ bool ParameterReflection::emitEvents()
             st = false;
             continue;
         }
-    
+
         std::string eventName = getInstanceName() + ReflectionRegistry::ParameterNameDelimiter + event.name;
-    
+
         // Evaluate condition and update parameter
         double val;
         try
@@ -269,7 +269,7 @@ bool ParameterReflection::emitEvents()
         }
         catch (mu::Parser::exception_type const& e)
         {
-            CONTROLIT_PR_ERROR 
+            CONTROLIT_PR_ERROR
                 << "Expression eval failed: " << e.GetMsg() << "\n"
                 << "-- Formula:  " << e.GetExpr() << "\n"
                 << "-- Token:    " << e.GetToken() << "\n"
@@ -278,7 +278,7 @@ bool ParameterReflection::emitEvents()
             st = false;
             continue;
         }
-    
+
         param->set(val);
         if (val > 0.5)
         {

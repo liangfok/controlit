@@ -6,6 +6,7 @@ its desired position. The velocity vs. time plot of the
 trajectory looks like a trapezoid.
 
 See: https://humancenteredrobotics.atlassian.net/wiki/display/WBC/2015.02.19+A+Trapezoid+Velocity+Trajectory+Generator
+See LaTeX source code in: controlit/controlit_trajectory_generators/docs/01_trapezoid_velocity/
 '''
 
 import sys, getopt     # for getting and parsing command line arguments and exiting
