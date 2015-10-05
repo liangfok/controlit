@@ -14,7 +14,7 @@
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}%
 
 % Swap the definition of \abs* and \norm*, so that \abs
-% and \norm resizes the size of the brackets, and the 
+% and \norm resizes the size of the brackets, and the
 % starred version does not.
 \makeatletter
 \let\oldabs\abs
@@ -73,17 +73,17 @@
 
 %%% The "real" document content comes below...
 
-\title{Trapezoid Velocity Trajectory Generator}
+\title{Trapezoid Velocity Trajectory Generator: Implied Duration}
 \author{Chien-Liang Fok}
 %\date{} % Activate to display a given date or no date (if empty),
-         % otherwise the current date is printed 
+         % otherwise the current date is printed
 
 \begin{document}
 \maketitle
 
 \section{Introduction}
 
-The velocity trajectory takes the shape of a trapezoid as shown in Figure~\ref{fig:velocity_vs_time}.
+This document contains details on how we derived the equations for a smooth position trajectory that takes the shape of an elongated ``S'' as shown in Figure~\ref{fig:position_vs_time}. The velocity trajectory looks like a trapezoid as shown in Figure~\ref{fig:velocity_vs_time}. The inputs to the algorithm are the initial and final positions, the acceleration, the deceleration, and the steady state velocity.
 
 \begin{figure}[tbh]
     \centering
@@ -104,7 +104,7 @@ The velocity trajectory takes the shape of a trapezoid as shown in Figure~\ref{f
     \label{fig:trapezoid_trajectory}
 \end{figure}
 
- \noindent As shown in Figure~\ref{fig:trapezoid_trajectory}, the initial position is $X_{init}$ and the final position is $X_{final}$. The initial acceleration is $A_{accel}$ and the final deceleration is $A_{decel}$. The maximum velocity is upper bounded by $V_{steady}$. Currently the initial and final velocities are assumed to be zero. Overall, the trajectory is split into three phases:
+ \noindent The initial position is $X_{init}$ and the final position is $X_{final}$. The initial acceleration is $A_{accel}$ and the final deceleration is $A_{decel}$. The maximum velocity is upper bounded by $V_{steady}$. Currently the initial and final velocities are assumed to be zero. Overall, the trajectory is split into three phases:
 
 \begin{enumerate}
 \item A constant acceleration phase from time $t_0$ to $t_1$
@@ -112,7 +112,8 @@ The velocity trajectory takes the shape of a trapezoid as shown in Figure~\ref{f
 \item A constant deceleration phase from time $t_2$ to $t_3$
 \end{enumerate}
 
-\noindent The inputs to the trajectory generation algorithm are shown in Table~\ref{table:inputs}.
+\section{Algorithm 1: Implied Duration}
+In this algorithm, the time (duration of trajectory) is not an input parameter. The inputs to the trajectory generation algorithm are shown in Table~\ref{table:inputs}.
 
 \begin{table}[tbh]
   \centering
@@ -132,9 +133,7 @@ The velocity trajectory takes the shape of a trapezoid as shown in Figure~\ref{f
   \label{table:inputs}
 \end{table}
 
-\section{Derivation of Trajectory}
-
-\subsection{Time Accelerating and Decelerating}
+\subsection{Time Accelerating and Decelerating Assuming $V_{steady}$ is Reached}
 
 Let $T_{accel}$ be the time spent accelerating and $T_{decel}$ be the time spent decelerating. Assuming the maximum velocity is reached, they are defined as:
 
@@ -146,17 +145,17 @@ T_{accel} = \abs{V_{steady} / A_{accel}} \label{eq:time_accel_to_max_vel}
 T_{decel} = \abs{V_{steady} / A_{decel}} \label{eq:time_dec_from_max_vel}
 \end{equation}
 
-Since the accelerations are constant, the distance traveled is equal to the time spent accelerating multiplied by half of the velocity. Thus, the total distance covered accelerating and decelerating is:
+Since the accelerations are constant, the distance traveled is equal to the time spent accelerating multiplied by half of $V_{steady}$. Thus, the total distance covered accelerating and decelerating is:
 
 \begin{equation}
 D_{accel} = (T_{accel} +  T_{decel}) \cdot \frac{|V_{steady}|}{2}
 \end{equation}
 
-There are two cases. The first case is if $D_{accel} \le |X_{final} - X_{init}|$, the trajectory will reach $V_{steady}$. This case will be handled in Section~\ref{sec:able_to_reach_V_steady}. The second case is if $D_{accel} > |X_{final} - X_{init}|$, the trajectory will not reach $V_{steady}$. This case will be handled in Section~\ref{sec:unable_to_reach_V_steady}.
+There are two cases. The first case is when $V_{steady}$ is actually reached meaning $D_{accel} \le |X_{final} - X_{init}|$. This case is analyzed in Section~\ref{sec:able_to_reach_V_steady}. The second case is if $V_{steady}$ is not reached, meaning $D_{accel} > |X_{final} - X_{init}|$. This case is analyzed in Section~\ref{sec:unable_to_reach_V_steady}.
 
 \subsection{Case 1: $V_{steady}$ is Reached} \label{sec:able_to_reach_V_steady}
 
-Let $T_{steady}$ be the amount of time spent at $V_{steady}$, i.e., $t_2 - t_1$. The equation for $T_{steady}$ is: 
+Let $T_{steady}$ be the amount of time spent at $V_{steady}$, i.e., $T_{steady} = t_2 - t_1$. The equation for $T_{steady}$ is:
 
 \begin{equation}
 T_{steady} = \frac{|X_{final} - X_{init}| - D_{accel}}{|V_{steady}|}
@@ -168,13 +167,13 @@ T_{steady} = \frac{|X_{final} - X_{init}| - D_{accel}}{|V_{steady}|}
 t_0 & = & 0 \\
 t_1 & = & T_{accel} \\
 t_2 & = & t_1 + T_{steady} \\
-t_3 & = & t_2 + T_{decel} 
+t_3 & = & t_2 + T_{decel}
 \end{eqnarray}
 
 \noindent To derive the velocity vs. Time equation, we need to compute the trajectory between times $t_2$ and $t_3$. The equation is given by:
 
 \begin{equation}
-\frac{dx}{dt} = A_{decel} \cdot t + c_1 
+\frac{dx}{dt} = A_{decel} \cdot t + c_1
 \label{eq:velocity_vs_time_phase3_1}
 \end{equation}
 
@@ -192,7 +191,7 @@ c_1 & = & -A_{decel} \cdot t_3
   \begin{array}{rl}
      A_{accel}  \cdot t & \text{if } 0 \le t \le t_1\\
     V_{steady} & \text{if } t_1 \le t \le t_2 \\
-     A_{decel}  \cdot t + c_1 & \text{if } t_2 \le t \le t_3 
+     A_{decel}  \cdot t + c_1 & \text{if } t_2 \le t \le t_3
   \end{array} \right.
 \label{eq:case1_velocity_vs_time}
 \end{equation}
@@ -206,7 +205,7 @@ x(t) = \left\{
     \frac{A_{accel}}{2} \cdot t^{2} + X_{init} &  \text{if } t_0 \le t \le t_1\\
     V_{steady} \cdot t + c_2 & \text{if } t_1 \le t \le t_2 \text{~and~} t_1 \ne t_2\\
     \frac{A_{decel}}{2} \cdot t^{2} + c_1 \cdot t + c_3 & \text{if } t_2 \le t \le t_3 \\
-     X_{final} & \text{if } t \ge t_3 
+     X_{final} & \text{if } t \ge t_3
   \end{array} \right.
  \label{eq:case1_position_vs_time}
 \end{equation}
@@ -224,7 +223,7 @@ x(t) & = & V_{steady} \cdot t + c_2 \nonumber \\
 \begin{eqnarray}
 x(t) & = & \frac{A_{decel}}{2} \cdot t^{2} + c_1 \cdot t + c_3 \nonumber \\
 V_{steady} \cdot t_2 + c_2 & = & \frac{A_{decel}}{2} \cdot t_2^2 + c_1 \cdot t_2 + c_3 \nonumber \\
- c_3 & = & V_{steady} \cdot t_2 + c_2 - \frac{A_{decel}}{2} \cdot t_2^2 - c_1 \cdot t_2 
+ c_3 & = & V_{steady} \cdot t_2 + c_2 - \frac{A_{decel}}{2} \cdot t_2^2 - c_1 \cdot t_2
   \end{eqnarray}
 
 \noindent This concludes the derivation of the position vs. time trajectory for case 1 where $V_{steady}$ is reachable.
@@ -258,7 +257,7 @@ In this case, the steady state velocity $V_{steady}$ is not reached because the 
 \frac{dx}{dt}(t) = \left\{
   \begin{array}{rl}
      A_{accel}  \cdot t & \text{if } 0 \le t \le t_m\\
-     A_{decel}  \cdot t + c_4 & \text{if } t_m \le t \le t_3 
+     A_{decel}  \cdot t + c_4 & \text{if } t_m \le t \le t_3
   \end{array} \right.
 \label{eq:case2_velocity_vs_time}
 \end{equation}
@@ -269,7 +268,7 @@ In this case, the steady state velocity $V_{steady}$ is not reached because the 
 x(t)  = \left\{
   \begin{array}{rl}
      \frac{A_{accel}}{2}  \cdot t^2 + X_{init} & \text{if } 0 \le t \le t_m\\
-    \frac{A_{decel}}{2}  \cdot t^2 + c_4 \cdot t + c_5 & \text{if } t_m \le t \le t_3 
+    \frac{A_{decel}}{2}  \cdot t^2 + c_4 \cdot t + c_5 & \text{if } t_m \le t \le t_3
   \end{array} \right.
 \label{eq:case2_position_vs_time}
 \end{equation}
@@ -372,7 +371,7 @@ t_m  & = & \sqrt{\frac{2 \cdot A_{decel} \cdot (X_{init} - X_{final})}{A_{accel}
 %\begin{dmath}
 %\left( \frac{A_{decel} - A_{accel}}{2} \right)  \cdot t_m^2 + c_4 \cdot t_m + c_5 - X_{init}  = \\
 % \frac{A_{decel}}{2}  \cdot \left( \frac{A_{decel} - A_{accel}}{A_{decel}} \cdot t_m \right)^2  + c_4 \cdot\frac{A_{decel} - A_{accel}}{A_{decel}} \cdot t_m + c_5 - X_{final}
-%\label{eq:case2_reduction1} 
+%\label{eq:case2_reduction1}
 %\end{dmath}
 %
 %%\begin{eqnarray}
@@ -384,28 +383,28 @@ t_m  & = & \sqrt{\frac{2 \cdot A_{decel} \cdot (X_{init} - X_{final})}{A_{accel}
 %
 %\begin{dmath}
 %\left( \frac{A_{decel} - A_{accel}}{2} - \frac{A_{decel}}{2} \cdot \left(\frac{A_{decel} - A_{accel}}{2}\right)^2\right) \cdot t^2_m + \left(c_4 - c_4 \cdot \frac{A_{decel} - A_{accel}}{A_{decel}} \right) \cdot t_m + X_{final} - X_{init}  = 0
-%\label{eq:case2_reduction2} 
+%\label{eq:case2_reduction2}
 %\end{dmath}
 %
 %\noindent Equation~\ref{eq:case2_reduction2} contains two variables: $c_4$ and $t_m$. To replace $c_4$ with $t_m$ in Equation~\ref{eq:case2_reduction2}, plug Equation~\ref{eq:case2_c4_in_terms_of_tm} into ~\ref{eq:case2_reduction2}:
 %
 %\begin{dmath}
 %\left( \frac{A_{decel} - A_{accel}}{2} - \frac{A_{decel}}{2} \cdot \left(\frac{A_{decel} - A_{accel}}{2}\right)^2\right) \cdot t^2_m + \left( (A_{accel} - A_{decel}) \cdot t_m -  (A_{accel} - A_{decel}) \cdot t_m \cdot \frac{A_{decel} - A_{accel}}{A_{decel}} \right) \cdot t_m + X_{final} - X_{init}  = 0
-%\label{eq:case2_reduction3} 
+%\label{eq:case2_reduction3}
 %\end{dmath}
 %
 %\noindent We can combine the $t_m$ variables in the middle of Equation~\ref{eq:case2_reduction3} as follows:
 %
 %\begin{dmath}
 %\left( \frac{A_{decel} - A_{accel}}{2} - \frac{A_{decel}}{2} \cdot \left(\frac{A_{decel} - A_{accel}}{2}\right)^2\right) \cdot t^2_m + \left( (A_{accel} - A_{decel}) -  (A_{accel} - A_{decel}) \cdot \frac{A_{decel} - A_{accel}}{A_{decel}} \right) \cdot t^2_m + X_{final} - X_{init}  = 0
-%\label{eq:case2_reduction4} 
+%\label{eq:case2_reduction4}
 %\end{dmath}
 %
 %\noindent The two intances of $t^2_m$ in Equation~\ref{eq:case2_reduction4} can be combined:
 %
 %\begin{dmath}
 %\left( \frac{A_{decel} - A_{accel}}{2} - \frac{A_{decel}}{2} \cdot \left(\frac{A_{decel} - A_{accel}}{2}\right)^2 + (A_{accel} - A_{decel}) -  (A_{accel} - A_{decel}) \cdot \frac{A_{decel} - A_{accel}}{A_{decel}} \right) \cdot t^2_m + X_{final} - X_{init}  = 0
-%\label{eq:case2_reduction5} 
+%\label{eq:case2_reduction5}
 %\end{dmath}
 %
 %\noindent Now we can solve for $t_m$:
@@ -447,5 +446,9 @@ t_1  & = & t_m\\
 t_2 & = & t_m
 \end{eqnarray}
 
-\noindent This concludes the derivation of the trapezoid velocity-shaped trajectory.
+\noindent This concludes the derivation of the trapezoid velocity-shaped trajectory when the duration is implied.
+
+\section{Algorithm 2: Explicit Duration}
+Here we derive an trajectory where the total duration of the trajectory, i.e., $t_3$, is an input parameter.
+
 \end{document}
