@@ -50,10 +50,10 @@ OrientVectorToVectorTask::OrientVectorToVectorTask() :
     paramErrorAngle = declareParameter("errorAngle",       & errorAngle);
     paramGoalHeading = declareParameter("goalHeading",     & goalHeading);
     paramActualHeading = declareParameter("actualHeading", & actualHeading);
-  
+
     // Create the PD controller
     controller.reset(PDControllerFactory::create(SaturationPolicy::NormVel));
-  
+
     // Add controller parameters to this task
     controller->declareParameters(this);
 }
@@ -69,7 +69,7 @@ void OrientVectorToVectorTask::addDefaultBindings()
     if (!hasBinding("kd"))              addParameter(createROSInputBinding("kd", "std_msgs/Float64"));
     if (!hasBinding("enableState"))     addParameter(createROSInputBinding("enableState", "std_msgs/Int32"));
     if (!hasBinding("tare"))            addParameter(createROSInputBinding("tare", "std_msgs/Int32"));
-    
+
     if (!hasBinding("error"))               addParameter(createROSOutputBinding("error", "std_msgs/Float64MultiArray"));
     if (!hasBinding("errorDot"))            addParameter(createROSOutputBinding("errorDot", "std_msgs/Float64MultiArray"));
     if (!hasBinding("errorNorm"))           addParameter(createROSOutputBinding("errorNorm", "std_msgs/Float64"));
@@ -83,9 +83,9 @@ void OrientVectorToVectorTask::addDefaultBindings()
 bool OrientVectorToVectorTask::init(ControlModel & model)
 {
     PRINT_DEBUG_STATEMENT("Method called!")
-  
+
     // Initialize the parent class (frameId lookup)
-  
+
     // Abort if parent class fails to initialize
     if (!LatchedTask::init(model)) return false;
     if (!model.getBodyID(bodyName_, bodyId_)) return false;
@@ -100,29 +100,29 @@ bool OrientVectorToVectorTask::init(ControlModel & model)
     Jtloc.resize(3, model.getNumDOFs());
     Rbody.resize(3, 3);
     Rframe.resize(3, 3);
-  
+
     // CONTROLIT_PR_INFO << "bodyId_ = " << bodyId_ << ", frameId_ = " << frameId_;
-  
+
     if (bodyFrameVector_.rows() != 3)
     {
         CONTROLIT_PR_ERROR << "bodyFrameVector_ must have 3 dimensions, got " << bodyFrameVector_.rows();
         return false;
     }
-  
+
     if (goalVector_.rows() != 3)
     {
         CONTROLIT_PR_ERROR << "goalVector_ must have 3 dimensions, got " << goalVector_.rows();
         return false;
     }
-  
+
     // Normalize the current heading and goal heading vectors
     bodyFrameVector_.normalize();
     goalVector_.normalize();
-  
+
     // Create a real-time-safe ROS topic publisher for visualizing the current and goal
     // heading vectors
     visualizationPublisher.init(getInstanceName() + "/" + markerTopic, 1);
-  
+
 
     // Initialize the message within the visualization publisher
     while (!visualizationPublisher.trylock()) usleep(200);
@@ -183,33 +183,33 @@ bool OrientVectorToVectorTask::init(ControlModel & model)
 bool OrientVectorToVectorTask::updateStateImpl(ControlModel * model, TaskState * taskState)
 {
     PRINT_DEBUG_STATEMENT("Method called!")
-  
+
     assert(model != nullptr);
     assert(taskState != nullptr);
-  
+
     Matrix & taskJacobian = taskState->getJacobian();
-  
+
     int numDOFs = model->getNumDOFs();
-  
+
     // Normalize vectors in case they have been updated
     bodyFrameVector_.normalize();
     goalVector_.normalize();
-  
+
     // Check if latched status has been updated
     updateLatch(model);
-  
+
     if(taskJacobian.rows() != 3 || taskJacobian.cols() != numDOFs)
     {
         PRINT_DEBUG_STATEMENT("Resizing task Jacobian to be 3x" << numDOFs)
         taskJacobian.resize(3, numDOFs);
     }
-  
+
     RigidBodyDynamics::CalcPointJacobianW(model->rbdlModel(), model->getQ(), bodyId_, Vector::Zero(3), JwBody, false);
     Rbody = RigidBodyDynamics::CalcBodyWorldOrientation(model->rbdlModel(), model->getQ(), bodyId_, false);
-  
+
     Vector RTeBody = Rbody.transpose() * bodyFrameVector_;
     taskJacobian = -RigidBodyDynamics::Math::VectorCrossMatrix(RTeBody) * JwBody;
-  
+
     if(frameId_ != -1) // Goal vector is in a robot reference frame, either latched or unlatched
     {
         if(!isLatched) // Need to account for relative motion of the reference frame in the Jacobian
@@ -220,7 +220,7 @@ bool OrientVectorToVectorTask::updateStateImpl(ControlModel * model, TaskState *
             taskJacobian += RigidBodyDynamics::Math::VectorCrossMatrix(goal) * JwFrame;
         }
     }
-  
+
     return true;
 }
 
@@ -228,7 +228,7 @@ bool OrientVectorToVectorTask::getCommand(ControlModel & model, TaskCommand & co
 {
     // Get the latest joint state information
     Vector Q(model.getNumDOFs());
-    Vector Qd(model.getNumDOFs());  
+    Vector Qd(model.getNumDOFs());
     model.getLatestFullState(Q, Qd);
 
     // Get orientation of the local body vector in the world frame
@@ -240,40 +240,40 @@ bool OrientVectorToVectorTask::getCommand(ControlModel & model, TaskCommand & co
         goalVector_ = Rbody.transpose() * bodyFrameVector_;   // assumes goalVector_ is in world coordinate frame
         tare = 0;
     }
-  
+
     // Just in case, normalize the current and goal vectors
     bodyFrameVector_.normalize();
     goalVector_.normalize();
-  
+
     // Check if latched status has been updated
     updateLatch(&model);
-  
+
     getJacobian(Jtloc);
-  
-  
+
+
     // Compute the goal vector in the frameName_ coordinate frame
     // goalHeading = goalVector_;
     paramGoalHeading->set(goalVector_); // sets member variable "goalHeading"
-  
+
     if(frameId_ != -1) // The goal vector is in robot frame, either latched or not
     {
         if(isLatched)
             Rframe = latchedRotation;
         else
             Rframe = RigidBodyDynamics::CalcBodyWorldOrientation(model.rbdlModel(), Q, frameId_, false);  // TODO: Use Latest State
-    
+
         goalHeading = Rframe.transpose() * goalVector_;
     }
-  
+
     // Get the heading in the frameName_ coordinate frame
     actualHeading = Rbody.transpose() * bodyFrameVector_;
     paramActualHeading->set(actualHeading);
-  
+
     // Compute the error (goal heading - current heading)
     /*if (goalHeading.cols() != actualHeading.cols() || goalHeading.rows() != actualHeading.rows())
     {
         CONTROLIT_ERROR << "Matrix size error:\n"
-                        << "  - goalHeading =\n" << goalHeading << "\n" 
+                        << "  - goalHeading =\n" << goalHeading << "\n"
                         << "  - goalVector =\n" << goalVector_ << "\n"
                         << "  - frameId_ = " << frameId_ << "\n"
                         << "  - RFrame =\n" << Rframe << "\n"
@@ -286,14 +286,14 @@ bool OrientVectorToVectorTask::getCommand(ControlModel & model, TaskCommand & co
     double error = std::acos(goalHeading.dot(actualHeading) / (goalHeading.norm() * actualHeading.norm()))
         * 180 / 3.141592653589793238463;
     paramErrorAngle->set(error);
-  
+
     // Set the command type
     command.type = commandType_;
-  
+
     // Compute the command
     // The goal velocity is zero, thus the velocity error is -Jtloc * Qd.
     controller->computeCommand(e0, -Jtloc * Qd, command.command, this);
-  
+
     Vector base_vector;
     base_vector.setZero(3);
 
@@ -323,7 +323,7 @@ bool OrientVectorToVectorTask::getCommand(ControlModel & model, TaskCommand & co
         visualizationPublisher.unlockAndPublish();
 
     }
-  
+
     return true;
 }
 
