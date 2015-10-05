@@ -177,6 +177,12 @@ bool OrientVectorToVectorTask::init(ControlModel & model)
     // Publish the MarkerArray
     visualizationPublisher.unlockAndPublish();
 
+    Q.setZero(model.getNumDOFs());
+    Qd.setZero(model.getNumDOFs());
+
+    base_vector.setZero(3);
+    tran_BodyToBase.setZero(3);
+
     return Task::init(model);
 }
 
@@ -224,11 +230,9 @@ bool OrientVectorToVectorTask::updateStateImpl(ControlModel * model, TaskState *
     return true;
 }
 
-bool OrientVectorToVectorTask::getCommand(ControlModel & model, TaskCommand & command)
+bool OrientVectorToVectorTask::sense(ControlModel & model)
 {
     // Get the latest joint state information
-    Vector Q(model.getNumDOFs());
-    Vector Qd(model.getNumDOFs());
     model.getLatestFullState(Q, Qd);
 
     // Get orientation of the local body vector in the world frame
@@ -250,7 +254,6 @@ bool OrientVectorToVectorTask::getCommand(ControlModel & model, TaskCommand & co
 
     getJacobian(Jtloc);
 
-
     // Compute the goal vector in the frameName_ coordinate frame
     // goalHeading = goalVector_;
     paramGoalHeading->set(goalVector_); // sets member variable "goalHeading"
@@ -269,6 +272,12 @@ bool OrientVectorToVectorTask::getCommand(ControlModel & model, TaskCommand & co
     actualHeading = Rbody.transpose() * bodyFrameVector_;
     paramActualHeading->set(actualHeading);
 
+    return true;
+}
+
+bool OrientVectorToVectorTask::getCommand(ControlModel & model, TaskCommand & command)
+{
+    if (!sense(model)) return false;
     // Compute the error (goal heading - current heading)
     /*if (goalHeading.cols() != actualHeading.cols() || goalHeading.rows() != actualHeading.rows())
     {
@@ -294,10 +303,7 @@ bool OrientVectorToVectorTask::getCommand(ControlModel & model, TaskCommand & co
     // The goal velocity is zero, thus the velocity error is -Jtloc * Qd.
     controller->computeCommand(e0, -Jtloc * Qd, command.command, this);
 
-    Vector base_vector;
-    base_vector.setZero(3);
-
-    Vector tran_BodyToBase = RigidBodyDynamics::CalcBodyToBaseCoordinates(model.rbdlModel(), Q, bodyId_, base_vector, false);
+    tran_BodyToBase = RigidBodyDynamics::CalcBodyToBaseCoordinates(model.rbdlModel(), Q, bodyId_, base_vector, false);
 
     // If we are able to grab the lock on visualizationPublisher,
     // publish the visualization markers.
@@ -321,7 +327,6 @@ bool OrientVectorToVectorTask::getCommand(ControlModel & model, TaskCommand & co
 
         // Publish the MarkerArray
         visualizationPublisher.unlockAndPublish();
-
     }
 
     return true;

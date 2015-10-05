@@ -52,14 +52,19 @@ public:
      * The constructor.
      */
     OrientVectorToVectorTask();
-  
+
     /*!
      * Initializes this task.
      *
      * \param[in] model The control model used to execute this task.
      */
     virtual bool init(ControlModel & model);
-  
+
+    /*!
+     * Computes the current orientation.
+     */
+    virtual bool sense(ControlModel & model);
+
     /*!
      * Computes the desired commands.
      */
@@ -76,21 +81,21 @@ protected:
      * \return Whether the update state operation was successful.
      */
     virtual bool updateStateImpl(ControlModel * model, TaskState * taskState);
-  
+
     /*!
      * The name of the body whose coordinate frame is used to define
      * the current heading vector.
      */
     std::string bodyName_;
-  
+
     /*!
      * The RBDL ID of the body whose heading is being controlled.
      */
     unsigned int bodyId_;
-  
+
     Vector goalVector_; // Which defines a vector to whic the bodyFrameVector_ will be aligned
     Vector bodyFrameVector_; //Vector in body frame to align to the goalVector_ in the specified frame
-  
+
     /*!
      * A PD controller
      */
@@ -101,45 +106,45 @@ private:
     void addDefaultBindings();
 
     Matrix JwBody, JwFrame, Rframe, Jtloc;
-  
+
     /*
      * A rotation matrix that converts from the world coordinate frame into the
      * body's coordinate frame.
      */
     Matrix Rbody;
-  
+
     /*!
      * The actual heading in the world coordinate frame.
      */
     Vector actualHeading;
-  
+
     /*!
      * The goal heading in the world coordinate frame.
      */
     Vector goalHeading;
-  
+
     /*!
      * The heading error (goal heading - current heading).
      */
     Vector e0;
-  
+
     /*!
      * Used to publish the goal and current 2D Orientation markers.
      */
     controlit::addons::ros::RealtimePublisher<visualization_msgs::MarkerArray>
         visualizationPublisher;
-  
+
     /*!
      * The topic on which to publish the marker array messages for visualizing the
      * reference vector and current vector.
      */
     std::string markerTopic;
-  
+
     /*!
      * The angle between the goal heading and the current heading.
      */
     double errorAngle;
-  
+
     /*!
      * Persistent pointers to parameters.  These pointers are maintained to prevent
      * having to call lookupParameter(...) every time getCommand(...) is called.
@@ -147,6 +152,12 @@ private:
     controlit::Parameter * paramErrorAngle;
     controlit::Parameter * paramGoalHeading;
     controlit::Parameter * paramActualHeading;
+
+    // Variables used by sense()
+    Vector Q, Qd;
+
+    Vector base_vector;
+    Vector tran_BodyToBase;
 };
 
 } // namespace task_library
