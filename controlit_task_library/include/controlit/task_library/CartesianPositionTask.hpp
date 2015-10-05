@@ -61,7 +61,7 @@ public:
     virtual bool init(ControlModel & model);
 
     /*!
-     * Computes the current COM.
+     * Computes the current Cartesian position.
      */
     virtual bool sense(ControlModel & model);
 
