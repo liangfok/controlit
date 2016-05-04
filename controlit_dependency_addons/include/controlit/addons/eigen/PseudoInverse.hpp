@@ -34,7 +34,7 @@ namespace eigen {
  * followed by thresholding on the singular values.
  *
  * \param[in] M The matrix to find the pseudo inverse of.
- * \param[out] Minv Where the results should be sored.
+ * \param[out] Minv Where the results should be stored.
  * \param[in] epsilon Controls cutoff for small singular values
 */
 template<typename DerivedA, typename OutputMatrixType>
